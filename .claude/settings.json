@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem \"d:\\\\Project\\\\07_moneypick\" -Force)",
+      "Bash(Get-ChildItem \"d:\\\\Project\" -Force)",
+      "Read(//d/Project/**)",
+      "Read(//c/Users/jfact/.claude/projects/d--Project-07-moneypick/memory/**)"
+    ]
+  }
+}
