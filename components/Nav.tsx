@@ -12,7 +12,7 @@ export default function Nav() {
           {categories.map((cat) => (
             <li key={cat.id} className="shrink-0">
               <Link
-                href={`/${cat.slug}`}
+                href={`/${cat.enSlug}`}
                 className="flex items-center gap-1.5 px-4 py-3.5 text-[13px] font-medium text-[#5B6168] dark:text-slate-400 hover:text-[#21A05A] dark:hover:text-[#21A05A] whitespace-nowrap border-b-2 border-transparent hover:border-[#21A05A] transition-colors"
               >
                 <span aria-hidden="true" className="text-[15px]">{cat.icon}</span>

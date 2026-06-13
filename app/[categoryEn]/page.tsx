@@ -2,28 +2,28 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Breadcrumb from '@/components/Breadcrumb';
 import PostCard from '@/components/PostCard';
+import { getPostsByCategory } from '@/lib/db';
 import { categories } from '@/src/data/categories';
-import { allPosts } from '@/src/data/posts';
 
-interface Props { params: Promise<{ category: string }> }
+interface Props { params: Promise<{ categoryEn: string }> }
 
-function findCategory(value: string) {
-  return categories.find((item) => item.slug === decodeURIComponent(value));
+function findCategory(enSlug: string) {
+  return categories.find((c) => c.enSlug === decodeURIComponent(enSlug));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const cat = findCategory((await params).category);
+  const cat = findCategory((await params).categoryEn);
   return cat ? { title: cat.name, description: cat.description } : {};
 }
 
 export function generateStaticParams() {
-  return categories.map((category) => ({ category: category.slug }));
+  return categories.map((c) => ({ categoryEn: c.enSlug }));
 }
 
 export default async function CategoryPage({ params }: Props) {
-  const cat = findCategory((await params).category);
+  const cat = findCategory((await params).categoryEn);
   if (!cat) notFound();
-  const posts = allPosts.filter((post) => post.categoryId === cat.id && post.status === 'published');
+  const posts = await getPostsByCategory(cat.id);
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-10 md:py-14">
@@ -38,9 +38,13 @@ export default async function CategoryPage({ params }: Props) {
         <span className="text-sm text-[#8A949E]">총 {posts.length}개</span>
       </div>
       {posts.length ? (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{posts.map((post) => <PostCard key={post.id} post={post} />)}</div>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => <PostCard key={post.id} post={post} />)}
+        </div>
       ) : (
-        <div className="rounded-2xl border border-dashed border-[#DDE3EB] p-10 text-center text-sm text-[#8A949E] dark:border-navy-600">이 카테고리의 콘텐츠를 준비하고 있습니다.</div>
+        <div className="rounded-2xl border border-dashed border-[#DDE3EB] p-10 text-center text-sm text-[#8A949E] dark:border-navy-600">
+          이 카테고리의 콘텐츠를 준비하고 있습니다.
+        </div>
       )}
     </div>
   );

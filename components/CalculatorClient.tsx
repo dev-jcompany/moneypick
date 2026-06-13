@@ -61,6 +61,40 @@ const configs: Record<string, { fields: { key: string; label: string; default: n
     ],
     note: '비영업용 승용차의 배기량별 세액과 지방교육세 30%를 계산합니다. 차령 3년차부터 매년 5%씩 최대 50% 경감합니다.',
   },
+  mortgage: {
+    fields: [
+      { key: 'principal', label: '대출금액', default: 300000000, unit: '원' },
+      { key: 'rate', label: '연 금리', default: 4.0, unit: '%' },
+      { key: 'years', label: '대출기간', default: 30, unit: '년' },
+      { key: 'repayType', label: '상환 방식', default: 'annuity', type: 'select', options: [['annuity', '원리금균등'], ['principal', '원금균등']] },
+    ],
+    note: '원리금균등은 매월 동일한 금액을 납부하고, 원금균등은 초기 납부액이 높고 점차 줄어드는 방식입니다. 실제 대출 조건은 금융기관 심사에 따라 달라집니다.',
+  },
+  savings: {
+    fields: [
+      { key: 'monthly', label: '월 납입액', default: 500000, unit: '원' },
+      { key: 'rate', label: '연 금리', default: 3.5, unit: '%' },
+      { key: 'months', label: '납입 기간', default: 24, unit: '개월' },
+      { key: 'taxType', label: '과세 유형', default: 'normal', type: 'select', options: [['normal', '일반과세 (15.4%)'], ['exempt', '비과세']] },
+    ],
+    note: '단리 방식 정기적금 기준입니다. 세금은 이자소득세 14% + 지방소득세 1.4%를 적용합니다. 실제 상품 조건은 금융기관에 따라 다를 수 있습니다.',
+  },
+  severance: {
+    fields: [
+      { key: 'monthlySalary', label: '최근 3개월 월 평균임금', default: 4000000, unit: '원' },
+      { key: 'years', label: '근속연수', default: 5, unit: '년' },
+      { key: 'months', label: '추가 근무월', default: 0, unit: '개월' },
+    ],
+    note: '법정 퇴직금은 1일 평균임금 × 30일 × 근속연수 공식으로 계산합니다. 퇴직소득세는 별도이며, 실제 수령액은 회사 규정 및 세금에 따라 달라질 수 있습니다.',
+  },
+  'gift-tax': {
+    fields: [
+      { key: 'amount', label: '증여 재산가액', default: 100000000, unit: '원' },
+      { key: 'relation', label: '증여자 관계', default: 'parent', type: 'select', options: [['parent', '직계존속(부모·조부모)'], ['child', '직계비속(자녀)'], ['spouse', '배우자'], ['other', '기타 친족/타인']] },
+      { key: 'minor', label: '수증자 미성년 여부', default: 'adult', type: 'select', options: [['adult', '성인'], ['minor', '미성년자']] },
+    ],
+    note: '10년간 합산 공제 한도: 배우자 6억, 직계존속 5천만(미성년 2천만), 직계비속 5천만, 기타 1천만 원. 실제 세액은 전문 세무사 상담을 권장합니다.',
+  },
 };
 
 function annuityAnnual(principal: number, annualRate: number, years: number) {
@@ -145,10 +179,53 @@ function calculate(slug: string, v: Values): Result[] {
     const deductions = pension + health + care + employment + incomeTax + localTax;
     return [{ label: '월 세전 급여', value: monthly }, { label: '월 공제 예상액', value: deductions }, { label: '월 예상 실수령액', value: monthly - deductions, emphasize: true }, { label: '연 예상 실수령액', value: (monthly - deductions) * 12 }];
   }
-  const base = String(v.vehicleType) === 'electric' ? 100000 : n('cc') * (n('cc') <= 1000 ? 80 : n('cc') <= 1600 ? 140 : 200);
-  const discount = n('age') >= 3 ? Math.min(0.5, (n('age') - 2) * 0.05) : 0;
-  const discounted = base * (1 - discount);
-  return [{ label: '자동차세', value: discounted }, { label: '지방교육세', value: discounted * 0.3 }, { label: '연간 납부 예상액', value: discounted * 1.3, emphasize: true }, { label: '차령 경감률', value: discount * 100, suffix: '%' }];
+  if (slug === 'car-tax') {
+    const base = String(v.vehicleType) === 'electric' ? 100000 : n('cc') * (n('cc') <= 1000 ? 80 : n('cc') <= 1600 ? 140 : 200);
+    const discount = n('age') >= 3 ? Math.min(0.5, (n('age') - 2) * 0.05) : 0;
+    const discounted = base * (1 - discount);
+    return [{ label: '자동차세', value: discounted }, { label: '지방교육세', value: discounted * 0.3 }, { label: '연간 납부 예상액', value: discounted * 1.3, emphasize: true }, { label: '차령 경감률', value: discount * 100, suffix: '%' }];
+  }
+  if (slug === 'mortgage') {
+    const P = n('principal'), r = n('rate') / 100 / 12, m = n('years') * 12;
+    if (String(v.repayType) === 'principal') {
+      const monthlyPrincipal = P / m;
+      const firstMonthInterest = P * r;
+      const lastMonthInterest = monthlyPrincipal * r;
+      const totalInterest = P * r * (m + 1) / 2;
+      return [{ label: '첫 달 납부액', value: monthlyPrincipal + firstMonthInterest, emphasize: true }, { label: '월 원금', value: monthlyPrincipal }, { label: '마지막 달 납부액', value: monthlyPrincipal + lastMonthInterest }, { label: '총 이자', value: totalInterest }];
+    }
+    const monthly = r ? P * r * (1 + r) ** m / ((1 + r) ** m - 1) : P / m;
+    const totalInterest = monthly * m - P;
+    return [{ label: '월 납부액', value: monthly, emphasize: true }, { label: '총 상환금액', value: monthly * m }, { label: '총 이자', value: totalInterest }, { label: '이자 비율', value: totalInterest / (monthly * m) * 100, suffix: '%' }];
+  }
+  if (slug === 'savings') {
+    const monthly = n('monthly'), rate = n('rate') / 100, months = n('months');
+    const totalPrincipal = monthly * months;
+    const interest = monthly * rate / 12 * (months * (months + 1) / 2);
+    const taxRate = String(v.taxType) === 'exempt' ? 0 : 0.154;
+    const afterTax = interest * (1 - taxRate);
+    return [{ label: '총 납입 원금', value: totalPrincipal }, { label: '세전 이자', value: interest }, { label: '세후 이자', value: afterTax }, { label: '만기 수령액', value: totalPrincipal + afterTax, emphasize: true }];
+  }
+  if (slug === 'severance') {
+    const daily = n('monthlySalary') / 30;
+    const totalMonths = n('years') * 12 + n('months');
+    const amount = daily * 30 * (totalMonths / 12);
+    return [{ label: '1일 평균임금', value: daily }, { label: '근속기간', value: totalMonths, suffix: '개월' }, { label: '예상 퇴직금', value: amount, emphasize: true }];
+  }
+  if (slug === 'gift-tax') {
+    const amount = n('amount');
+    const relation = String(v.relation);
+    const minor = String(v.minor) === 'minor';
+    const deduction = relation === 'spouse' ? 600000000 : relation === 'parent' ? (minor ? 20000000 : 50000000) : relation === 'child' ? 50000000 : 10000000;
+    const taxBase = Math.max(0, amount - deduction);
+    const brackets: [number, number, number][] = [[10000000, 0.1, 0], [50000000, 0.2, 1000000], [100000000, 0.3, 6000000], [300000000, 0.4, 16000000], [Infinity, 0.5, 56000000]];
+    let tax = 0;
+    for (const [limit, rate, deductionAmt] of brackets) {
+      if (taxBase <= limit) { tax = taxBase * rate - deductionAmt; break; }
+    }
+    return [{ label: '공제 한도', value: deduction }, { label: '과세표준', value: taxBase }, { label: '예상 증여세', value: Math.max(0, tax), emphasize: true }, { label: '실효세율', value: amount ? Math.max(0, tax) / amount * 100 : 0, suffix: '%' }];
+  }
+  return [];
 }
 
 export default function CalculatorClient({ slug }: { slug: string }) {

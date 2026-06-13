@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import AppShell from '@/components/AppShell';
@@ -19,7 +18,6 @@ export const metadata: Metadata = {
     locale: 'ko_KR',
     siteName: '머니픽(MoneyPick)',
   },
-  // TODO: 다음 단계에서 추가 — sitemap.ts, robots.ts, JSON-LD 구조화 데이터
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -31,7 +29,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
-        <Script id="theme-init" strategy="beforeInteractive">{`(function(){var s=localStorage.getItem('theme');var p=s||'dark';if(p==='dark')document.documentElement.classList.add('dark');})();`}</Script>
+        {/* eslint-disable-next-line react/no-danger */}
+        <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(!t||t==='dark')document.documentElement.classList.add('dark')}catch(e){}})();` }} />
       </head>
       <body className="bg-[#F6F8FA] dark:bg-navy-950 text-[#1A1D1F] dark:text-slate-100 min-h-screen flex flex-col">
         <ThemeProvider>

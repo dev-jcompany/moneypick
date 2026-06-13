@@ -1,10 +1,14 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
     system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+
+  /* Custom breakpoints */
+  --breakpoint-widescreen: 1440px;
 
   /* Navy dark palette */
   --color-navy-950: #020910;
@@ -44,18 +48,63 @@ body {
   pointer-events: none;
 }
 
+/* 붙여넣기 콘텐츠 강제 초기화 */
+.admin-editor,
+.admin-editor * {
+  background-color: transparent !important;
+  color: inherit;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+.admin-editor {
+  background-color: #ffffff !important;
+  color: #29332f;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.admin-editor h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 1.5rem 0 0.75rem;
+  color: #1a1d1f;
+}
+
 .admin-editor h2 {
   font-size: 1.35rem;
   font-weight: 800;
   margin: 1.25rem 0 0.5rem;
+  color: #1a1d1f;
+}
+
+.admin-editor h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 1rem 0 0.4rem;
+  color: #1a1d1f;
+}
+
+.admin-editor p {
+  margin: 0.5rem 0;
+}
+
+.admin-editor a {
+  color: #21a05a !important;
+  text-decoration: underline;
 }
 
 .admin-editor blockquote {
   border-left: 4px solid #21a05a;
-  color: #52605a;
+  color: #52605a !important;
   margin: 1rem 0;
   padding: 0.75rem 1rem;
-  background: #f3f8f5;
+  background: #f3f8f5 !important;
+}
+
+.admin-editor hr {
+  border: none;
+  border-top: 2px solid #e8ecef;
+  margin: 1.5rem 0;
 }
 
 .admin-editor ul,
@@ -66,4 +115,39 @@ body {
 
 .admin-editor ul { list-style: disc; }
 .admin-editor ol { list-style: decimal; }
-.admin-editor img { border-radius: 0.75rem; margin: 1rem auto; max-width: 100%; }
+.admin-editor img { border-radius: 0.75rem; margin: 1rem auto; max-width: 100%; display: block; }
+
+/* ── 공개 포스트 본문: 외부 HTML 스타일 격리 ── */
+.post-content {
+  isolation: isolate;
+  color: #343a40;
+}
+.post-content *,
+.post-content *::before,
+.post-content *::after {
+  background-color: transparent !important;
+  color: inherit;
+  max-width: 100% !important;
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+/* 배경이 있어야 하는 요소 예외 처리 */
+.post-content blockquote {
+  background-color: #f3f8f5 !important;
+}
+.post-content code,
+.post-content pre {
+  background-color: #f6f8fa !important;
+  color: #24292e !important;
+}
+.post-content a {
+  color: #21a05a !important;
+}
+.post-content img {
+  display: block;
+  max-width: 100% !important;
+  height: auto;
+  border-radius: 0.75rem;
+  margin: 1rem auto;
+}

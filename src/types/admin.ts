@@ -1,6 +1,9 @@
 export interface AdminPost {
   id: string;
   title: string;
+  slug?: string;
+  postNumber?: number;
+  englishSlug?: string;
   categoryId: string;
   status: 'published' | 'draft';
   content: string;

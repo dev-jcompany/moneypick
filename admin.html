@@ -1,0 +1,62 @@
+<!-- 이 박스 안의 내용을 마우스로 직접 클릭하여 글을 작성해 보세요! -->
+<div style="max-width: 650px; margin: 20px auto; padding: 25px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; font-family: 'Pretendard', sans-serif; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+  
+  <!-- 헤더 -->
+  <div style="border-bottom: 2px solid #10b981; padding-bottom: 15px; margin-bottom: 20px;">
+    <h2 style="margin: 0; color: #0f172a; font-size: 22px;">🟢 머니픽 어드민 — 콘텐츠 등록</h2>
+    <p style="margin: 5px 0 0 0; color: #64748b; font-size: 13px;">비개발자 운영용 단순화 버전</p>
+  </div>
+
+  <!-- 1. 카테고리 선택 -->
+  <div style="margin-bottom: 20px;">
+    <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #334155; font-size: 14px;">1. 카테고리 선택</label>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <label style="cursor: pointer; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 13px;"><input type="radio" name="category" value="loan" checked> 💰 대출연구소</label>
+      <label style="cursor: pointer; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 13px;"><input type="radio" name="category" value="estate"> 🏠 부동산연구소</label>
+      <label style="cursor: pointer; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 13px;"><input type="radio" name="category" value="tax"> 📊 세금연구소</label>
+      <label style="cursor: pointer; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 13px;"><input type="radio" name="category" value="job"> 💼 직장인연구소</label>
+      <label style="cursor: pointer; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 13px;"><input type="radio" name="category" value="invest"> 📈 투자연구소</label>
+    </div>
+  </div>
+
+  <!-- 2. 제목 입력 -->
+  <div style="margin-bottom: 20px;">
+    <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #334155; font-size: 14px;">2. 글 제목</label>
+    <input type="text" placeholder="예시: 2026년 청년 버팀목 전세자금대출 조건 총정리" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px;">
+  </div>
+
+  <!-- 3. 대표 이미지 -->
+  <div style="margin-bottom: 20px;">
+    <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #334155; font-size: 14px;">3. 대표 썸네일 이미지</label>
+    <input type="file" style="font-size: 13px; color: #64748b;">
+  </div>
+
+  <!-- 4. 본문 작성 -->
+  <div style="margin-bottom: 20px;">
+    <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #334155; font-size: 14px;">4. 본문 내용 (블로그처럼 작성하세요)</label>
+    <!-- 간단 툴바 흉내 -->
+    <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-bottom: none; padding: 6px 10px; border-radius: 6px 6px 0 0; display: flex; gap: 15px; font-size: 12px; color: #64748b;">
+      <span><b>B</b> 굵게</span> <span><i>I</i> 기울임</span> <span>🔗 링크</span> <span>📷 사진추가</span>
+    </div>
+    <textarea placeholder="여기에 대중들에게 공유할 유익한 금융 정보 글을 입력하세요..." style="width: 100%; height: 200px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 0 0 6px 6px; box-sizing: border-box; font-size: 14px; resize: vertical; font-family: inherit;"></textarea>
+  </div>
+
+  <!-- 5. 태그 지정 -->
+  <div style="margin-bottom: 25px;">
+    <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #334155; font-size: 14px;">5. 연관 인기 태그 (중복 선택 가능)</label>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; font-size: 13px; color: #475569;">
+      <label style="cursor: pointer;"><input type="checkbox" value="전세대출"> #전세대출</label>
+      <label style="cursor: pointer;"><input type="checkbox" value="DSR"> #DSR</label>
+      <label style="cursor: pointer;"><input type="checkbox" value="ISA"> #ISA</label>
+      <label style="cursor: pointer;"><input type="checkbox" value="실업급여"> #실업급여</label>
+      <label style="cursor: pointer;"><input type="checkbox" value="자동차세"> #자동차세</label>
+    </div>
+  </div>
+
+  <!-- 6. 저장 및 발행 버튼 -->
+  <div style="display: flex; justify-content: flex-end; gap: 10px;">
+    <button type="button" style="padding: 10px 18px; border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff; color: #334155; font-size: 14px; cursor: pointer;">임시저장</button>
+    <button type="button" onclick="alert('🎉 축하합니다! 작성하신 콘텐츠가 머니픽에 성공적으로 등록(발행)되었습니다.')" style="padding: 10px 22px; border: none; border-radius: 6px; background: #10b981; color: #ffffff; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(16,185,129,0.2);">콘텐츠 등록하기 (발행)</button>
+  </div>
+
+</div>

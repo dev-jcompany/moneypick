@@ -3,13 +3,19 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useAdmin } from '@/components/admin/AdminStore';
+import { supabase } from '@/lib/supabase';
 
 export default function ContentListPage() {
   const { posts, setPosts, categories } = useAdmin();
   const [sort, setSort] = useState<'latest' | 'views'>('latest');
   const [query, setQuery] = useState('');
   const list = useMemo(() => [...posts].filter((post) => post.title.toLowerCase().includes(query.toLowerCase())).sort((a, b) => sort === 'views' ? b.views - a.views : b.updatedAt.localeCompare(a.updatedAt)), [posts, query, sort]);
-  const remove = (id: string) => { if (window.confirm('이 콘텐츠를 삭제할까요?')) setPosts((current) => current.filter((post) => post.id !== id)); };
+  const remove = async (id: string) => {
+    if (!window.confirm('이 콘텐츠를 삭제할까요?')) return;
+    const { error } = await supabase.from('posts').delete().eq('id', id);
+    if (error) { window.alert(`삭제 실패: ${error.message}`); return; }
+    setPosts((current) => current.filter((post) => post.id !== id));
+  };
   return (
     <div className="mx-auto max-w-[1200px]">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-2xl font-extrabold">콘텐츠 목록</h2><p className="mt-1 text-sm text-slate-500">발행 글과 임시저장 글을 관리합니다.</p></div><Link href="/admin/content/new" className="rounded-xl bg-[#21A05A] px-5 py-3 text-sm font-bold text-white">+ 새 콘텐츠</Link></div>

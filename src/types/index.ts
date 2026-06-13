@@ -8,6 +8,7 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
+  enSlug: string;
   icon: string;
   description: string;
   color: string;
@@ -17,9 +18,11 @@ export interface Post {
   id: string;
   title: string;
   slug: string;
+  postNumber?: number;
+  englishSlug?: string;
   categoryId: string;
   authorId: string;
-  summary: [string, string, string];
+  summary: string[];
   content: string;
   thumbnail: string;
   metaDescription: string;

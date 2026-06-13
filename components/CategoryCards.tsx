@@ -20,7 +20,7 @@ export default function CategoryCards() {
             return (
               <Link
                 key={cat.id}
-                href={`/${cat.slug}`}
+                href={`/${cat.enSlug}`}
                 className="bg-white dark:bg-navy-800 rounded-xl border border-[#E8ECEF] dark:border-navy-700 p-4 hover:shadow-md hover:-translate-y-0.5 hover:border-[#21A05A] dark:hover:border-[#21A05A] transition-all group"
               >
                 <div

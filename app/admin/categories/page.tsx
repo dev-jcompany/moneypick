@@ -9,7 +9,7 @@ export default function CategoriesPage() {
   const [icon, setIcon] = useState('📚');
   const add = () => {
     if (!name.trim()) return;
-    setCategories((current) => [...current, { id: crypto.randomUUID(), name: name.trim(), slug: name.trim().replace(/\s+/g, '-'), icon, description: `${name.trim()}의 실용 정보를 제공합니다.`, color: 'green' }]);
+    setCategories((current) => [...current, { id: crypto.randomUUID(), name: name.trim(), slug: name.trim().replace(/\s+/g, '-'), enSlug: name.trim().toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-'), icon, description: `${name.trim()}의 실용 정보를 제공합니다.`, color: 'green' }]);
     setName('');
   };
   return (
