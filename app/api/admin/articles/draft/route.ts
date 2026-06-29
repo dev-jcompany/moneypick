@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'node:crypto';
 import { adminPath } from '@/lib/admin-path';
+import { createArticleThumbnail } from '@/lib/article-thumbnail';
 import { createMoneypickArticle } from '@/lib/db';
 import type { ArticleSavePayload } from '@/lib/db';
 
@@ -16,6 +17,7 @@ type DraftRequestBody = {
   tags?: unknown;
   status?: unknown;
   source?: unknown;
+  heroStat?: unknown;
   heroValue?: unknown;
   heroLabel?: unknown;
   readingTime?: unknown;
@@ -68,6 +70,21 @@ function requireString(value: unknown, label: string) {
 function optionalString(value: unknown): string | null {
   if (typeof value === 'string' && value.trim().length > 0) return value.trim();
   return null;
+}
+
+function buildMetaDescription(metaDescription: string | null, summary: string) {
+  const source = metaDescription ?? summary;
+  return source.replace(/\s+/g, ' ').trim().slice(0, 180);
+}
+
+function splitHeroStat(value: string | null) {
+  if (!value) return { heroValue: null, heroLabel: null };
+  if (!value.includes('/')) return { heroValue: null, heroLabel: null };
+  const [heroValue, ...labelParts] = value.split('/');
+  return {
+    heroValue: heroValue?.trim() || null,
+    heroLabel: labelParts.join('/').trim() || null,
+  };
 }
 
 function normalizeSlug(value: string) {
@@ -141,11 +158,21 @@ export async function POST(req: NextRequest) {
     }
 
     const seoTitle = optionalString(body.seoTitle);
-    const metaDescription = optionalString(body.metaDescription) ?? summary.value;
-    const thumbnailUrl = optionalString(body.thumbnailUrl);
+    const metaDescription = buildMetaDescription(optionalString(body.metaDescription), summary.value);
+    const lead = summary.value;
     const readingTime = optionalString(body.readingTime);
-    const heroValue = optionalString(body.heroValue);
-    const heroLabel = optionalString(body.heroLabel);
+    const source = typeof body.source === 'string' ? body.source : 'claude_scheduled';
+    const heroStat = splitHeroStat(optionalString(body.heroStat) ?? summary.value);
+    const heroValue = optionalString(body.heroValue) ?? heroStat.heroValue;
+    const heroLabel = optionalString(body.heroLabel) ?? heroStat.heroLabel;
+    const thumbnailUrl =
+      optionalString(body.thumbnailUrl) ??
+      (await createArticleThumbnail({
+        title: title.value,
+        slug,
+        categoryKey: category.key,
+        categoryLabel: category.label,
+      }));
 
     const payload: ArticleSavePayload = {
       slug,
@@ -153,13 +180,13 @@ export async function POST(req: NextRequest) {
       category_label: category.label,
       title: title.value,
       seo_title: seoTitle,
-      lead: summary.value,
+      lead,
       meta_description: metaDescription,
       body_html: contentHtml.value,
-      summary: [summary.value],
+      summary: [lead],
       faq: [],
       tags,
-      editor: '머니픽 에디터',
+      editor: source === 'claude_desktop' ? 'Claude Desktop' : '머니픽 에디터',
       reading_time: readingTime,
       hero_value: heroValue,
       hero_label: heroLabel,
@@ -167,7 +194,7 @@ export async function POST(req: NextRequest) {
       disclaimer: null,
       thumbnail_url: thumbnailUrl,
       status: 'draft',
-      source: typeof body.source === 'string' ? body.source : 'claude_scheduled',
+      source,
     };
 
     const result = await createMoneypickArticle(payload);
@@ -190,6 +217,7 @@ export async function POST(req: NextRequest) {
         editUrl: `${req.nextUrl.origin}${adminPath(`/articles/${result.id}`)}`,
         status: 'draft',
         source: payload.source,
+        thumbnailUrl: payload.thumbnail_url,
         ignoredColumns: result.ignoredColumns,
       },
       { status: 201 },

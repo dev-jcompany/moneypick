@@ -1,7 +1,26 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { categories } from '@/src/data/categories';
+import type { Category } from '@/src/types';
 
 export default function Nav() {
+  const [items, setItems] = useState<Category[]>(categories);
+
+  useEffect(() => {
+    let ignore = false;
+    fetch('/api/categories?visible=1')
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!ignore && data?.categories?.length) setItems(data.categories);
+      })
+      .catch(() => {});
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
   return (
     <nav
       className="bg-white dark:bg-navy-900 border-b border-[#E8ECEF] dark:border-navy-700"
@@ -9,7 +28,7 @@ export default function Nav() {
     >
       <div className="max-w-[1200px] mx-auto px-4">
         <ul className="flex items-center overflow-x-auto scrollbar-hide">
-          {categories.map((cat) => (
+          {items.map((cat) => (
             <li key={cat.id} className="shrink-0">
               <Link
                 href={`/${cat.enSlug}`}

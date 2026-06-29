@@ -3,71 +3,72 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { adminPath, toPublicAdminPath } from '@/lib/admin-path';
 
 const groups = [
   {
     label: '콘텐츠 관리',
-    icon: '📝',
+    icon: '✍️',
     items: [
-      { href: '/admin/content/new', label: '새 글 작성' },
-      { href: '/admin/content', label: '글 목록', matchPrefix: true },
-      { href: '/admin/categories', label: '카테고리 관리' },
-      { href: '/admin/tags', label: '태그 관리' },
+      { href: adminPath('/articles/new'), label: '새 글 작성' },
+      { href: adminPath('/articles'), label: '글 목록', matchPrefix: true },
+      { href: adminPath('/categories'), label: '카테고리 관리' },
+      { href: adminPath('/tags'), label: '태그 관리' },
     ],
   },
   {
     label: '계산기 관리',
     icon: '🧮',
     items: [
-      { href: '/admin/calculators', label: '계산기 순서/변수 설정' },
+      { href: adminPath('/calculators'), label: '계산기 순서/변수 설정' },
     ],
   },
   {
     label: '공지사항',
     icon: '📢',
     items: [
-      { href: '/admin/notices/new', label: '새 공지 등록' },
-      { href: '/admin/notices', label: '공지 목록', matchPrefix: true },
+      { href: adminPath('/notices/new'), label: '새 공지 등록' },
+      { href: adminPath('/notices'), label: '공지 목록', matchPrefix: true },
     ],
   },
   {
     label: '뉴스레터',
     icon: '✉️',
     items: [
-      { href: '/admin/subscribers', label: '구독자 목록' },
-      { href: '/admin/newsletter', label: '발송 관리' },
+      { href: adminPath('/subscribers'), label: '구독자 목록' },
+      { href: adminPath('/newsletter'), label: '발송 관리' },
     ],
   },
   {
     label: '미디어',
     icon: '🖼️',
     items: [
-      { href: '/admin/media', label: '이미지 라이브러리' },
+      { href: adminPath('/media'), label: '이미지 라이브러리' },
     ],
   },
   {
     label: '설정',
     icon: '⚙️',
     items: [
-      { href: '/admin/settings', label: '사이트 기본정보' },
-      { href: '/admin/users', label: '운영자 계정' },
+      { href: adminPath('/settings'), label: '사이트 기본정보' },
+      { href: adminPath('/users'), label: '운영자 계정' },
     ],
   },
 ];
 
 export default function AdminSidebar() {
-  const pathname = usePathname();
+  const pathname = toPublicAdminPath(usePathname());
   const [open, setOpen] = useState(false);
 
   const isActive = (href: string, matchPrefix?: boolean) => {
     if (pathname === href) return true;
-    if (matchPrefix && pathname.startsWith(href + '/') && pathname !== '/admin/content/new' && pathname !== '/admin/notices/new') return true;
+    if (matchPrefix && pathname.startsWith(href + '/') && pathname !== adminPath('/notices/new') && pathname !== adminPath('/articles/new')) return true;
     return false;
   };
 
   const sidebar = (
     <aside className="flex h-full w-[260px] flex-col bg-[#10231B] text-white">
-      <Link href="/admin" className="flex h-20 items-center gap-3 border-b border-white/10 px-6">
+      <Link href={adminPath()} className="flex h-20 items-center gap-3 border-b border-white/10 px-6">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#21A05A] font-black text-lg">M</span>
         <span>
           <strong className="block text-lg">머니픽</strong>
@@ -76,7 +77,7 @@ export default function AdminSidebar() {
       </Link>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        <Link href="/admin" onClick={() => setOpen(false)} className={`mb-4 flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-bold transition ${pathname === '/admin' ? 'bg-[#21A05A] text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}>
+        <Link href={adminPath()} onClick={() => setOpen(false)} className={`mb-4 flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-bold transition ${pathname === adminPath() ? 'bg-[#21A05A] text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}>
           <span>📊</span> 대시보드
         </Link>
 

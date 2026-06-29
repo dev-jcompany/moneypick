@@ -95,6 +95,92 @@ const configs: Record<string, { fields: { key: string; label: string; default: n
     ],
     note: '10년간 합산 공제 한도: 배우자 6억, 직계존속 5천만(미성년 2천만), 직계비속 5천만, 기타 1천만 원. 실제 세액은 전문 세무사 상담을 권장합니다.',
   },
+  deposit: {
+    fields: [
+      { key: 'principal', label: '예치 원금', default: 10000000, unit: '원' },
+      { key: 'rate', label: '연 금리', default: 3.5, unit: '%' },
+      { key: 'months', label: '예치 기간', default: 12, unit: '개월' },
+      { key: 'taxType', label: '과세 유형', default: 'normal', type: 'select', options: [['normal', '일반과세 (15.4%)'], ['exempt', '비과세']] },
+    ],
+    note: '단리 기준 정기예금입니다. 세금은 이자소득세 14% + 지방소득세 1.4%를 적용합니다.',
+  },
+  'jeonse-monthly-conversion': {
+    fields: [
+      { key: 'mode', label: '전환 방향', default: 'toMonthly', type: 'select', options: [['toMonthly', '전세 → 월세 전환'], ['toJeonse', '월세 → 전세 전환'], ['calcRate', '전환율 계산']] },
+      { key: 'jeonse', label: '전세 보증금', default: 300000000, unit: '원' },
+      { key: 'deposit', label: '월세 전환 후 보증금', default: 50000000, unit: '원' },
+      { key: 'monthly', label: '월세', default: 800000, unit: '원' },
+      { key: 'convRate', label: '전환율', default: 5.0, unit: '%' },
+    ],
+    note: '전월세 전환율 공식: (월세 × 12) ÷ (전세보증금 - 월세보증금) × 100. 법정 기준 전환율은 한국은행 기준금리 + 2%입니다.',
+  },
+  'acquisition-tax': {
+    fields: [
+      { key: 'price', label: '주택 취득가액', default: 600000000, unit: '원' },
+      { key: 'houseCount', label: '취득 후 보유 주택 수', default: 'one', type: 'select', options: [['one', '1주택'], ['two', '2주택'], ['three', '3주택 이상']] },
+      { key: 'area', label: '조정대상지역 여부', default: 'adj', type: 'select', options: [['adj', '조정대상지역'], ['non', '비조정지역']] },
+    ],
+    note: '1주택: 취득가 6억 이하 1%, 6억~9억 구간 비례, 9억 초과 3%. 다주택자 중과세율은 취득일 기준 법령을 반드시 확인하세요. 농어촌특별세·지방교육세 포함.',
+  },
+  'capital-gains-tax': {
+    fields: [
+      { key: 'buyPrice', label: '취득가액', default: 400000000, unit: '원' },
+      { key: 'sellPrice', label: '양도가액', default: 700000000, unit: '원' },
+      { key: 'expenses', label: '필요경비', default: 10000000, unit: '원' },
+      { key: 'holdYears', label: '보유기간', default: 5, unit: '년' },
+      { key: 'isOneHouse', label: '1세대 1주택 여부', default: 'no', type: 'select', options: [['yes', '1세대 1주택 비과세 요건 충족'], ['no', '해당 없음']] },
+    ],
+    note: '1세대 1주택 비과세는 2년 이상 보유(조정대상지역 거주 요건 별도)이며 12억 초과분은 과세됩니다. 실제 세액은 관할 세무서에 확인하세요.',
+  },
+  'comprehensive-income-tax': {
+    fields: [
+      { key: 'income', label: '총수입금액', default: 60000000, unit: '원' },
+      { key: 'expenseRate', label: '필요경비율(단순경비율)', default: 64.1, unit: '%' },
+      { key: 'basicDeduction', label: '기본공제 인원(본인 포함)', default: 1, unit: '명' },
+    ],
+    note: '단순경비율은 국세청 고시 기준이며 업종마다 다릅니다. 실제 신고는 장부 기장 또는 기준·단순경비율 방식 중 유리한 방법을 선택할 수 있습니다.',
+  },
+  'health-insurance': {
+    fields: [
+      { key: 'type', label: '가입 유형', default: 'employee', type: 'select', options: [['employee', '직장가입자'], ['regional', '지역가입자']] },
+      { key: 'salary', label: '보수월액(직장) / 월 소득(지역)', default: 3500000, unit: '원' },
+    ],
+    note: '2024년 기준 직장가입자 보험료율 7.09%(본인 50% 부담), 장기요양 0.9182%. 지역가입자는 소득·재산·자동차를 점수화한 부과점수로 계산되어 실제와 차이가 있을 수 있습니다.',
+  },
+  'national-pension': {
+    fields: [
+      { key: 'avgIncome', label: '월 평균소득', default: 3000000, unit: '원' },
+      { key: 'insuredYears', label: '가입기간', default: 20, unit: '년' },
+      { key: 'startAge', label: '수령 시작 나이', default: 'age63', type: 'select', options: [['age60', '60세(조기)'], ['age63', '63세(현행)'], ['age65', '65세(2033년~)']] },
+    ],
+    note: '기본연금액 = 1.485 × (A값 + B값) × (1 + 0.05×추가가입월/12). A값은 전체 가입자 3년 평균소득월액(2023년 기준 약 286만원). 실제 수령액은 국민연금공단에 문의하세요.',
+  },
+  'housing-subscription-score': {
+    fields: [
+      { key: 'noHouseYears', label: '무주택기간', default: 10, unit: '년' },
+      { key: 'dependents', label: '부양가족 수(본인 제외)', default: 2, unit: '명' },
+      { key: 'savingsYears', label: '청약통장 가입기간', default: 8, unit: '년' },
+    ],
+    note: '청약 가점 만점은 84점(무주택 32점 + 부양가족 35점 + 가입기간 17점). 무주택기간은 세대주 및 세대원 전원 기준으로 산정되며, 만 30세 미만 미혼은 산정 제외될 수 있습니다.',
+  },
+  'loan-refinancing': {
+    fields: [
+      { key: 'balance', label: '현재 대출 잔액', default: 200000000, unit: '원' },
+      { key: 'currentRate', label: '현재 금리', default: 5.5, unit: '%' },
+      { key: 'newRate', label: '신규 금리', default: 4.0, unit: '%' },
+      { key: 'remainYears', label: '잔여 기간', default: 20, unit: '년' },
+    ],
+    note: '원리금균등상환 기준 비교입니다. 대환 시 중도상환수수료, 근저당 설정 비용 등 부대비용을 반드시 확인하세요.',
+  },
+  'compound-interest': {
+    fields: [
+      { key: 'initial', label: '초기 투자금', default: 10000000, unit: '원' },
+      { key: 'monthly', label: '월 추가 납입', default: 500000, unit: '원' },
+      { key: 'rate', label: '연 수익률', default: 7.0, unit: '%' },
+      { key: 'years', label: '투자 기간', default: 20, unit: '년' },
+    ],
+    note: '세전 복리 수익 기준 추정치입니다. 실제 투자 상품의 수익률은 시장 상황에 따라 변동되며 원금 손실 가능성이 있습니다.',
+  },
 };
 
 function annuityAnnual(principal: number, annualRate: number, years: number) {
@@ -224,6 +310,122 @@ function calculate(slug: string, v: Values): Result[] {
       if (taxBase <= limit) { tax = taxBase * rate - deductionAmt; break; }
     }
     return [{ label: '공제 한도', value: deduction }, { label: '과세표준', value: taxBase }, { label: '예상 증여세', value: Math.max(0, tax), emphasize: true }, { label: '실효세율', value: amount ? Math.max(0, tax) / amount * 100 : 0, suffix: '%' }];
+  }
+  if (slug === 'deposit') {
+    const principal = n('principal'), rate = n('rate') / 100, months = n('months');
+    const interest = principal * rate * (months / 12);
+    const taxRate = String(v.taxType) === 'exempt' ? 0 : 0.154;
+    const afterTax = interest * (1 - taxRate);
+    return [{ label: '원금', value: principal }, { label: '세전 이자', value: interest }, { label: '세후 이자', value: afterTax }, { label: '만기 수령액', value: principal + afterTax, emphasize: true }];
+  }
+  if (slug === 'jeonse-monthly-conversion') {
+    const mode = String(v.mode);
+    const jeonse = n('jeonse'), deposit = n('deposit'), monthly = n('monthly'), convRate = n('convRate') / 100;
+    if (mode === 'toMonthly') {
+      const monthlyRent = (jeonse - deposit) * convRate / 12;
+      return [{ label: '전환 후 보증금', value: deposit }, { label: '월세', value: monthlyRent, emphasize: true }, { label: '적용 전환율', value: convRate * 100, suffix: '%' }];
+    }
+    if (mode === 'toJeonse') {
+      const jeonsePrice = deposit + monthly * 12 / convRate;
+      return [{ label: '전세 환산 보증금', value: jeonsePrice, emphasize: true }, { label: '월세 연 환산액', value: monthly * 12 }, { label: '적용 전환율', value: convRate * 100, suffix: '%' }];
+    }
+    // calcRate
+    const rate = jeonse > deposit ? (monthly * 12) / (jeonse - deposit) * 100 : 0;
+    return [{ label: '전환율', value: rate, suffix: '%', emphasize: true }, { label: '보증금 차액', value: jeonse - deposit }, { label: '월세 연 환산액', value: monthly * 12 }];
+  }
+  if (slug === 'acquisition-tax') {
+    const price = n('price'), houseCount = String(v.houseCount), area = String(v.area);
+    let rate = 0;
+    if (houseCount === 'one') {
+      if (price <= 600000000) rate = 0.01;
+      else if (price <= 900000000) rate = (price / 300000000 - 3) * 0.01; // 6~9억 구간 비례
+      else rate = 0.03;
+    } else if (houseCount === 'two') {
+      rate = area === 'adj' ? 0.08 : 0.01;
+    } else {
+      rate = area === 'adj' ? 0.12 : 0.08;
+    }
+    const acquisitionTax = price * rate;
+    const ruralTax = houseCount === 'one' ? acquisitionTax * 0.1 : 0;
+    const eduTax = acquisitionTax * 0.2;
+    return [{ label: '적용 취득세율', value: rate * 100, suffix: '%' }, { label: '취득세', value: acquisitionTax, emphasize: true }, { label: '지방교육세', value: eduTax }, { label: '합계', value: acquisitionTax + ruralTax + eduTax }];
+  }
+  if (slug === 'capital-gains-tax') {
+    const buyPrice = n('buyPrice'), sellPrice = n('sellPrice'), expenses = n('expenses'), holdYears = n('holdYears');
+    const isOneHouse = String(v.isOneHouse) === 'yes';
+    const gain = Math.max(0, sellPrice - buyPrice - expenses);
+    if (isOneHouse && sellPrice <= 1200000000) {
+      return [{ label: '양도차익', value: gain }, { label: '비과세 적용', value: 0, suffix: '' }, { label: '예상 양도세', value: 0, emphasize: true }];
+    }
+    // 장기보유특별공제 (일반: 3년~15년, 연 2%)
+    const ltcRate = isOneHouse ? Math.min(0.8, Math.max(0, holdYears - 2) * 0.04) : Math.min(0.3, Math.max(0, holdYears - 3) * 0.02);
+    const taxableGain = isOneHouse && sellPrice > 1200000000 ? gain * (sellPrice - 1200000000) / sellPrice : gain;
+    const afterLtc = taxableGain * (1 - ltcRate);
+    const basicDeduction = 2500000;
+    const taxBase = Math.max(0, afterLtc - basicDeduction);
+    const tax = progressiveTax(taxBase) * 1.1; // 지방소득세 포함
+    return [{ label: '양도차익', value: gain }, { label: '장기보유공제율', value: ltcRate * 100, suffix: '%' }, { label: '과세표준', value: taxBase }, { label: '예상 양도소득세', value: tax, emphasize: true }];
+  }
+  if (slug === 'comprehensive-income-tax') {
+    const income = n('income'), expenseRate = n('expenseRate') / 100, dependents = n('basicDeduction');
+    const netIncome = income * (1 - expenseRate);
+    const earnedDeduction = Math.min(20000000, income * 0.25);
+    const basicDeduction = dependents * 1500000;
+    const taxBase = Math.max(0, netIncome - earnedDeduction - basicDeduction);
+    const tax = progressiveTax(taxBase);
+    const localTax = tax * 0.1;
+    return [{ label: '소득금액(필요경비 차감)', value: netIncome }, { label: '과세표준', value: taxBase }, { label: '산출세액', value: tax }, { label: '예상 종합소득세(지방세 포함)', value: tax + localTax, emphasize: true }];
+  }
+  if (slug === 'health-insurance') {
+    const type = String(v.type), salary = n('salary');
+    let healthPremium = 0;
+    if (type === 'employee') {
+      const totalRate = 0.0709;
+      healthPremium = salary * totalRate / 2; // 본인 50%
+    } else {
+      // 지역가입자: 소득 기준 단순 추정 (실제는 점수제)
+      healthPremium = salary * 0.0709;
+    }
+    const ltcPremium = healthPremium * 0.1295; // 장기요양
+    return [{ label: '월 건강보험료', value: healthPremium, emphasize: true }, { label: '장기요양보험료', value: ltcPremium }, { label: '월 합계', value: healthPremium + ltcPremium }, { label: '연간 합계', value: (healthPremium + ltcPremium) * 12 }];
+  }
+  if (slug === 'national-pension') {
+    const avgIncome = n('avgIncome'), insuredYears = n('insuredYears');
+    const startAge = String(v.startAge);
+    const A = 2860000; // 2023년 전체 가입자 평균소득월액 (근사값)
+    const B = Math.min(5900000, Math.max(370000, avgIncome)); // 소득분위 클램프
+    const baseMonths = insuredYears * 12;
+    const extra = Math.max(0, baseMonths - 240);
+    const pension = 1.485 * (A + B) / 2 * (baseMonths / 12 / 20) * (1 + 0.05 * extra / 12);
+    const adjustedPension = startAge === 'age60' ? pension * 0.7 : startAge === 'age65' ? pension * 1.06 : pension;
+    return [{ label: '예상 월 수령액(63세 기준)', value: pension }, { label: '수령 시작 연령 반영 수령액', value: adjustedPension, emphasize: true }, { label: '연간 수령액', value: adjustedPension * 12 }];
+  }
+  if (slug === 'housing-subscription-score') {
+    const noHouseYears = Math.min(15, n('noHouseYears'));
+    const dependents = Math.min(6, n('dependents'));
+    const savingsYears = Math.min(15, n('savingsYears'));
+    const noHouseScore = noHouseYears <= 0 ? 2 : Math.min(32, 2 + Math.floor(noHouseYears) * 2);
+    const dependentScore = dependents === 0 ? 5 : Math.min(35, 5 + dependents * 5);
+    const savingsScore = savingsYears < 1 ? 1 : Math.min(17, 1 + Math.floor(savingsYears));
+    const total = noHouseScore + dependentScore + savingsScore;
+    return [{ label: '무주택기간 점수', value: noHouseScore, suffix: '점' }, { label: '부양가족 점수', value: dependentScore, suffix: '점' }, { label: '청약통장 가입기간 점수', value: savingsScore, suffix: '점' }, { label: '총 가점', value: total, suffix: '점', emphasize: true }];
+  }
+  if (slug === 'loan-refinancing') {
+    const balance = n('balance'), currentRate = n('currentRate') / 100 / 12, newRate = n('newRate') / 100 / 12, months = n('remainYears') * 12;
+    const currentMonthly = currentRate ? balance * currentRate * (1 + currentRate) ** months / ((1 + currentRate) ** months - 1) : balance / months;
+    const newMonthly = newRate ? balance * newRate * (1 + newRate) ** months / ((1 + newRate) ** months - 1) : balance / months;
+    const monthlySaving = currentMonthly - newMonthly;
+    const totalSaving = monthlySaving * months;
+    return [{ label: '현재 월 납부액', value: currentMonthly }, { label: '대환 후 월 납부액', value: newMonthly }, { label: '월 절감액', value: monthlySaving, emphasize: true }, { label: '총 절감 이자', value: totalSaving }];
+  }
+  if (slug === 'compound-interest') {
+    const initial = n('initial'), monthly = n('monthly'), rate = n('rate') / 100 / 12, years = n('years');
+    const months = years * 12;
+    const grown = initial * (1 + rate) ** months;
+    const grownMonthly = rate ? monthly * ((1 + rate) ** months - 1) / rate : monthly * months;
+    const total = grown + grownMonthly;
+    const totalPrincipal = initial + monthly * months;
+    return [{ label: '총 납입 원금', value: totalPrincipal }, { label: '복리 수익', value: total - totalPrincipal }, { label: '최종 자산', value: total, emphasize: true }, { label: '수익률', value: totalPrincipal ? (total - totalPrincipal) / totalPrincipal * 100 : 0, suffix: '%' }];
   }
   return [];
 }

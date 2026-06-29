@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import PostDetailView from '@/components/post/PostDetailView';
 import { getPostBySlug, getPostsByCategory, getPopularPosts } from '@/lib/db';
+import { siteUrl } from '@/lib/site';
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -36,7 +37,7 @@ export default async function PostPage({ params }: Props) {
       post={post}
       popular={popular}
       categoryPosts={categoryPosts}
-      canonicalUrl={`https://moneypick.kr/posts/${post.slug}`}
+      canonicalUrl={`${siteUrl}/posts/${post.slug}`}
     />
   );
 }

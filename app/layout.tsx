@@ -2,8 +2,10 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import AppShell from '@/components/AppShell';
+import { siteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: '머니픽 — 돈이 모이는 선택, MoneyPick',
     template: '%s | 머니픽',

@@ -1,11 +1,11 @@
 import type { MetadataRoute } from 'next';
-import { categories } from '@/src/data/categories';
+import { getVisibleCategories } from '@/lib/db';
 import { calculators } from '@/src/data/calculators';
 import { allPosts } from '@/src/data/posts';
+import { siteUrl } from '@/lib/site';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://moneypick.kr';
-
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const categories = await getVisibleCategories();
   const staticRoutes = ['', '/posts', '/calculators', '/news', '/about', '/contact', '/privacy', '/terms', '/disclaimer'];
   return [
     ...staticRoutes.map((path, index) => ({ url: `${siteUrl}${path}`, lastModified: new Date(), changeFrequency: index === 0 ? 'daily' as const : 'monthly' as const, priority: index === 0 ? 1 : 0.6 })),

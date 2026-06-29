@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import RichTextEditor from '@/components/admin/RichTextEditor';
 import { useAdmin } from '@/components/admin/AdminStore';
+import { adminPath } from '@/lib/admin-path';
 
 export default function NoticeEditorForm({ noticeId }: { noticeId?: string }) {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function NoticeEditorForm({ noticeId }: { noticeId?: string }) {
     const next = { id: existing?.id ?? crypto.randomUUID(), title: title.trim(), content, visible, createdAt: existing?.createdAt ?? new Date().toISOString() };
     setNotices((current) => existing ? current.map((item) => item.id === existing.id ? next : item) : [next, ...current]);
     window.alert('공지사항을 저장했습니다.');
-    router.push('/admin/notices');
+    router.push(adminPath('/notices'));
   };
 
   return (

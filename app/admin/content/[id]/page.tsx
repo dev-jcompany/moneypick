@@ -1,2 +1,6 @@
-import ContentEditorForm from '@/components/admin/ContentEditorForm';
-export default async function EditContentPage({ params }: { params: Promise<{ id: string }> }) { return <ContentEditorForm postId={(await params).id} />; }
+import { redirect } from 'next/navigation';
+import { adminPath } from '@/lib/admin-path';
+
+export default function EditContentPage() {
+  redirect(adminPath('/articles'));
+}

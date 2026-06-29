@@ -1,0 +1,161 @@
+/* ================================================
+   머니픽 콘텐츠 전용 스타일
+   --mp-accent / --mp-accent-dark : 컴포넌트가 inline style로 카테고리별 주입
+   --mp-line / --mp-sub / --mp-bg / --mp-ink    : 여기서 라이트/다크 정의
+   ================================================ */
+
+.mp-article {
+  --mp-line: #e5e7eb;
+  --mp-sub: #6b756e;
+  --mp-bg: #fafafa;
+  --mp-ink: #1a1d1b;
+}
+
+.dark .mp-article {
+  --mp-line: #112236;   /* navy-700 */
+  --mp-sub: #94a3b8;    /* slate-400 */
+  --mp-bg: #0b1829;     /* navy-800 */
+  --mp-ink: #f1f5f9;    /* slate-100 */
+}
+
+/* ================================================
+   FAQ 아코디언 — 다크 네이비 카드 스타일
+   ================================================ */
+.mp-faq {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #0f1a2e;
+}
+
+.mp-faq details {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.mp-faq details:last-child {
+  border-bottom: none;
+}
+
+.mp-faq details summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.9375rem;   /* 15px */
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-faq details summary::-webkit-details-marker { display: none; }
+.mp-faq details summary::marker { content: ''; }
+
+/* Q. 접두어 */
+.mp-faq details summary::before {
+  content: 'Q.';
+  flex-shrink: 0;
+  font-weight: 800;
+  color: var(--mp-accent, #21a05a);
+}
+
+/* +/− 토글 */
+.mp-faq details summary::after {
+  content: '+';
+  margin-left: auto;
+  flex-shrink: 0;
+  padding-left: 1rem;
+  font-size: 1.25rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--mp-accent, #21a05a);
+}
+
+.mp-faq details[open] > summary::after {
+  content: '\2212';  /* − */
+}
+
+/* 답변 */
+.mp-faq-answer {
+  margin: 0;
+  padding: 0.125rem 1.25rem 1.125rem 2.5rem;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: #94a3b8;
+}
+
+/* ================================================
+   공유 버튼 — 원형 컬러 아이콘
+   ================================================ */
+.mp-share-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  transition: opacity 0.15s ease, transform 0.12s ease;
+  flex-shrink: 0;
+}
+
+.mp-share-circle:hover {
+  opacity: 0.82;
+  transform: translateY(-1px);
+}
+
+.mp-share-kakao {
+  background: #fee500;
+  color: #3c1e1e;
+}
+
+.mp-share-facebook {
+  background: #1877f2;
+  color: #ffffff;
+}
+
+.mp-share-twitter {
+  background: #000000;
+  color: #ffffff;
+}
+
+.mp-share-link {
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid var(--mp-line, #e5e7eb);
+}
+
+.mp-share-save {
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid var(--mp-line, #e5e7eb);
+}
+
+.dark .mp-share-link,
+.dark .mp-share-save {
+  border-color: #1a3050;
+  color: #94a3b8;
+}
+
+/* ================================================
+   투자 유의 안내 — invest 카테고리 전용
+   ================================================ */
+.mp-invest-notice {
+  margin: 1.5rem 0 0;
+  padding: 0.875rem 1.25rem;
+  border-left: 4px solid #f59e0b;
+  border-radius: 0 0.625rem 0.625rem 0;
+  background: #fff7ed;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  color: #92400e;
+}
+
+.dark .mp-invest-notice {
+  background: rgba(120, 53, 15, 0.2);
+  border-left-color: #d97706;
+  color: #fde68a;
+}

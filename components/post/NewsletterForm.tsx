@@ -14,24 +14,24 @@ export default function NewsletterForm() {
 
   if (done) {
     return (
-      <p className="mt-5 rounded-xl bg-green-50 px-4 py-3 text-[13px] font-bold text-[#21A05A]">
+      <p className="mt-4 rounded-xl bg-white/70 px-4 py-3 text-[14px] font-bold text-[#21A05A]">
         ✓ 구독 신청이 완료되었습니다!
       </p>
     );
   }
 
   return (
-    <form onSubmit={submit} className="mt-5 flex gap-2">
+    <form onSubmit={submit} className="mt-4 flex flex-col gap-3 sm:flex-row">
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="이메일 주소를 입력하세요"
-        className="flex-1 rounded-xl border border-[#DDE5E1] px-4 py-3 text-[13px] outline-none focus:border-[#21A05A]"
+        className="min-w-0 flex-1 rounded-[14px] border border-[#CFE0D8] bg-white px-4 py-3 text-[14px] outline-none focus:border-[#21A05A]"
       />
       <button
         type="submit"
-        className="rounded-xl bg-[#21A05A] px-5 py-3 text-[13px] font-bold text-white hover:bg-[#17794A]"
+        className="shrink-0 rounded-[14px] bg-[#21A05A] px-6 py-3 text-[15px] font-extrabold text-white hover:bg-[#17794A]"
       >
         구독하기
       </button>

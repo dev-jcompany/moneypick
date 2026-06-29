@@ -50,12 +50,22 @@ function AdCard({ ad }: { ad: typeof ADS[number] }) {
 /** widescreen(1440px+) 전용 독립 광고 컬럼 */
 export default function AdColumn() {
   return (
-    <aside className="hidden widescreen:block">
-      <div className="sticky top-[100px] space-y-3">
-        <p className="mb-1 text-center text-[10px] font-medium tracking-widest text-slate-400">광고</p>
+    <aside className="hidden widescreen:order-last widescreen:block">
+      <div className="sticky top-[100px] relative space-y-3">
+        <p className="absolute inset-x-0 -top-6 text-center text-[10px] font-medium tracking-widest text-slate-400">광고</p>
         {ADS.map((ad) => <AdCard key={ad.id} ad={ad} />)}
       </div>
     </aside>
+  );
+}
+
+/** 사이드바 하단 배너 2개 (토스뱅크 + KB국민카드) */
+export function SidebarAdBanners() {
+  return (
+    <div className="space-y-3">
+      <p className="text-center text-[10px] font-medium tracking-widest text-slate-400">광고</p>
+      {ADS.slice(1).map((ad) => <AdCard key={ad.id} ad={ad} />)}
+    </div>
   );
 }
 
@@ -73,6 +83,30 @@ export function AdInline() {
           <p className="mt-1 whitespace-pre-line text-[13px] font-extrabold leading-snug">{ad.headline}</p>
         </div>
         <button type="button" className="self-start rounded-full bg-white/20 px-3 py-1 text-[10px] font-bold backdrop-blur-sm">
+          자세히 보기 →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** 사이드바 실시간 인기글 위 삼성증권 배너 (모든 해상도) */
+export function SidebarTopBanner() {
+  const ad = ADS[0];
+  return (
+    <div className="relative">
+      <p className="absolute inset-x-0 -top-6 text-center text-[10px] font-medium tracking-widest text-slate-400">광고</p>
+      <div
+        className={`${ad.height} ${ad.bg} ${ad.text} flex cursor-pointer flex-col justify-between overflow-hidden rounded-2xl p-5 transition-opacity hover:opacity-90`}
+      >
+        <div>
+          <span className="mb-2 inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wide">
+            {ad.brand}
+          </span>
+          <p className="mt-2 whitespace-pre-line text-[15px] font-extrabold leading-snug">{ad.headline}</p>
+          {ad.sub && <p className="mt-1.5 text-[12px] opacity-80">{ad.sub}</p>}
+        </div>
+        <button type="button" className="self-start rounded-full bg-white/20 px-4 py-1.5 text-[11px] font-bold backdrop-blur-sm">
           자세히 보기 →
         </button>
       </div>

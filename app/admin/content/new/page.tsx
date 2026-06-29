@@ -1,2 +1,6 @@
-import ContentEditorForm from '@/components/admin/ContentEditorForm';
-export default function NewContentPage() { return <ContentEditorForm />; }
+import { redirect } from 'next/navigation';
+import { adminPath } from '@/lib/admin-path';
+
+export default function NewContentPage() {
+  redirect(adminPath('/articles/new'));
+}

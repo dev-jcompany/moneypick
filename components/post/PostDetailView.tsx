@@ -2,16 +2,15 @@ import Link from 'next/link';
 import FaqAccordion from '@/components/FaqAccordion';
 import JsonLd from '@/components/JsonLd';
 import AdColumn from '@/components/post/AdColumn';
-import NewsletterForm from '@/components/post/NewsletterForm';
+import DetailPromoSection from '@/components/post/DetailPromoSection';
 import PostSidebar from '@/components/post/PostSidebar';
 import { categories } from '@/src/data/categories';
 import { calculators } from '@/src/data/calculators';
 import { faqs } from '@/src/data/faqs';
 import { getPostUrl } from '@/lib/url';
+import { siteUrl } from '@/lib/site';
 import { sanitizePostHtml } from '@/lib/sanitize';
 import type { Post } from '@/src/types';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://moneypick.kr';
 
 const SHARE_ICONS = [
   {
@@ -295,26 +294,7 @@ export default function PostDetailView({ post, popular, categoryPosts, canonical
             </section>
           )}
 
-          {/* 뉴스레터 + 카카오 */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <section className="flex flex-col justify-between rounded-2xl border border-[#DDE5E1] bg-white p-6">
-              <div>
-                <span className="mb-2 inline-block rounded-full bg-green-50 px-3 py-1 text-[10px] font-bold text-[#21A05A]">머니픽 뉴스레터</span>
-                <h3 className="mt-1 text-[17px] font-extrabold text-[#1A1D1F]">금융·재테크 정보를 이메일로 받아보세요!</h3>
-                <p className="mt-1.5 text-[13px] text-[#8A949E]">주 1회, 꼭 필요한 금융 정보만 골라 보내드립니다.</p>
-              </div>
-              <NewsletterForm />
-            </section>
-            <section className="flex items-center justify-between rounded-2xl bg-[#1A1D1F] p-6 text-white">
-              <div>
-                <span className="mb-2 inline-block rounded-full bg-[#FEE500]/20 px-3 py-1 text-[10px] font-bold text-[#FEE500]">카카오톡 채널</span>
-                <h3 className="mt-1 text-[17px] font-extrabold">카카오톡 채널 추가하고<br />실시간 금융 정보를 받아보세요!</h3>
-              </div>
-              <button type="button" className="ml-4 shrink-0 rounded-2xl bg-[#FEE500] px-5 py-3 text-[13px] font-bold text-[#3C1E1E] hover:bg-yellow-300">
-                채널 추가
-              </button>
-            </section>
-          </div>
+          <DetailPromoSection />
 
         </div>
       </div>

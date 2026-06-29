@@ -12,6 +12,8 @@ export interface Category {
   icon: string;
   description: string;
   color: string;
+  enabled?: boolean;
+  sortOrder?: number;
 }
 
 export interface Post {

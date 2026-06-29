@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { categories } from '@/src/data/categories';
+import { getVisibleCategories } from '@/lib/db';
 
 const colorMap: Record<string, { iconBg: string }> = {
   green:   { iconBg: 'bg-green-50 dark:bg-green-900/20' },
@@ -9,7 +9,9 @@ const colorMap: Record<string, { iconBg: string }> = {
   emerald: { iconBg: 'bg-emerald-50 dark:bg-emerald-900/20' },
 };
 
-export default function CategoryCards() {
+export default async function CategoryCards() {
+  const categories = await getVisibleCategories();
+
   return (
     <section className="py-10 bg-[#F6F8FA] dark:bg-navy-900 border-b border-[#E8ECEF] dark:border-navy-700">
       <div className="max-w-[1200px] mx-auto px-4">
