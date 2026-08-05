@@ -75,7 +75,7 @@ export default async function ArticlePage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[#F6F8FA] dark:bg-navy-950">
       <div className="mx-auto max-w-[1500px] px-4 py-6 md:px-6 lg:px-4">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,800px)_280px] lg:justify-center xl:grid-cols-[minmax(760px,800px)_minmax(340px,360px)] xl:gap-8 widescreen:grid-cols-[760px_300px_minmax(280px,300px)]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,940px)_300px] lg:justify-center xl:grid-cols-[minmax(900px,980px)_minmax(320px,360px)] xl:gap-8 widescreen:grid-cols-[minmax(0,980px)_220px_minmax(240px,260px)] widescreen:gap-5">
 
           {/* ── 본문 ── */}
           <main className="min-w-0">

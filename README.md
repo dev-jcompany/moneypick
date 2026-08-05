@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MoneyPick
 
-## Getting Started
+MoneyPick은 Next.js 기반의 금융 정보·계산기 서비스입니다. GitHub를 단일 원본으로 사용하며 로컬 PC와 GitHub Codespaces에서 같은 방식으로 개발할 수 있습니다.
 
-First, run the development server:
+## 빠른 시작
+
+필수 환경은 Node.js 22와 npm입니다.
 
 ```bash
+cp .env.example .env.local
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 `http://localhost:3000`을 엽니다. 실제 비밀값은 `.env.local`에만 저장하고 Git에 커밋하지 마세요.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 검증
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run build
+```
 
-## Learn More
+## Codespaces
 
-To learn more about Next.js, take a look at the following resources:
+GitHub 저장소의 **Code → Codespaces → Create codespace on master**를 선택합니다. 컨테이너가 만들어지면 `npm ci`가 자동 실행됩니다. 터미널에서 `npm run dev`를 실행하면 3000번 포트가 자동 전달됩니다.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+자세한 절차는 [`docs/setup`](docs/setup/) 문서를 참고하세요.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 주요 문서
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [GitHub 설정](docs/setup/GITHUB_SETUP.md)
+- [Codespaces 설정](docs/setup/CODESPACES_SETUP.md)
+- [로컬 설정](docs/setup/LOCAL_SETUP.md)
+- [개발 가이드](docs/setup/DEVELOPMENT_GUIDE.md)

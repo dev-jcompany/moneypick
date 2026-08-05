@@ -89,7 +89,7 @@ const initialSiteSettings: SiteSettings = {
   siteName: '머니픽',
   tagline: '돈이 모이는 선택, 머니픽',
   description: '대출, 부동산, 세금, 투자까지 꼭 필요한 금융정보를 쉽고 정확하게 제공합니다.',
-  contactEmail: 'hello@moneypick.kr',
+  contactEmail: '',
   instagramUrl: '',
   youtubeUrl: '',
   kakaoUrl: '',

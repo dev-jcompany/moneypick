@@ -1,24 +1,20 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminSecurityConfig } from '@/lib/env/server';
 
 export const ADMIN_COOKIE_NAME = 'admin_auth';
 
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
-const DEFAULT_ADMIN_USERNAME = 'admin';
-const DEFAULT_DEV_PASSWORD = 'moneypick-admin';
-
 function getAdminUsername() {
-  return process.env.ADMIN_USERNAME ?? DEFAULT_ADMIN_USERNAME;
+  return adminSecurityConfig().username;
 }
 
 function getAdminPassword() {
-  const password = process.env.ADMIN_PASSWORD;
-  if (password) return password;
-  return process.env.NODE_ENV === 'production' ? null : DEFAULT_DEV_PASSWORD;
+  return adminSecurityConfig().password;
 }
 
 function getSigningSecret() {
-  return process.env.ADMIN_AUTH_SECRET ?? getAdminPassword();
+  return adminSecurityConfig().signingSecret;
 }
 
 function safeEqual(a: string, b: string) {
@@ -35,7 +31,7 @@ function sign(value: string) {
 
 export function verifyAdminPassword(input: unknown) {
   const password = getAdminPassword();
-  return typeof input === 'string' && password !== null && safeEqual(input, password);
+  return typeof input === 'string' && safeEqual(input, password);
 }
 
 export function verifyAdminCredentials(username: unknown, password: unknown) {

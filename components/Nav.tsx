@@ -26,7 +26,7 @@ export default function Nav() {
       className="bg-white dark:bg-navy-900 border-b border-[#E8ECEF] dark:border-navy-700"
       aria-label="카테고리 내비게이션"
     >
-      <div className="max-w-[1200px] mx-auto px-4">
+      <div className="max-w-[1500px] mx-auto px-4">
         <ul className="flex items-center overflow-x-auto scrollbar-hide">
           {items.map((cat) => (
             <li key={cat.id} className="shrink-0">

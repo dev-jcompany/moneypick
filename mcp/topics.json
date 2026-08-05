@@ -711,7 +711,7 @@
       "보증금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 2,
@@ -725,7 +725,7 @@
       "주택청약"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 3,
@@ -739,7 +739,7 @@
       "소유권"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 4,
@@ -753,7 +753,7 @@
       "임차"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 5,
@@ -767,7 +767,7 @@
       "부동산세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 6,
@@ -781,7 +781,7 @@
       "부동산규제"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 7,
@@ -795,7 +795,7 @@
       "시세확인"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 8,
@@ -809,7 +809,7 @@
       "주택청약"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 9,
@@ -823,7 +823,7 @@
       "청약"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 10,
@@ -837,7 +837,7 @@
       "청약전략"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 11,
@@ -851,7 +851,7 @@
       "청약"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 12,
@@ -865,7 +865,7 @@
       "부동산세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 13,
@@ -879,7 +879,7 @@
       "입주권"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 14,
@@ -893,7 +893,7 @@
       "임차인"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 15,
@@ -907,7 +907,7 @@
       "전세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 16,
@@ -921,7 +921,7 @@
       "임차인"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 17,
@@ -935,7 +935,7 @@
       "절약"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 18,
@@ -949,7 +949,7 @@
       "부동산비교"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 19,
@@ -963,7 +963,7 @@
       "부동산세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 20,
@@ -977,7 +977,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 21,
@@ -991,7 +991,7 @@
       "2026"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 22,
@@ -1005,7 +1005,7 @@
       "부동산"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 23,
@@ -1019,7 +1019,7 @@
       "임차인"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 24,
@@ -1033,7 +1033,7 @@
       "전세사기"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 25,
@@ -1047,7 +1047,7 @@
       "계약체크"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 26,
@@ -1061,7 +1061,7 @@
       "허가구역"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 27,
@@ -1075,7 +1075,7 @@
       "주택수"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 28,
@@ -1089,7 +1089,7 @@
       "상가"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 29,
@@ -1103,7 +1103,7 @@
       "반환"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 30,
@@ -1117,7 +1117,7 @@
       "부동산비용"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 31,
@@ -1131,7 +1131,7 @@
       "대처법"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 32,
@@ -1145,7 +1145,7 @@
       "하자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 33,
@@ -1159,7 +1159,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 34,
@@ -1173,7 +1173,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 35,
@@ -1187,7 +1187,7 @@
       "절약"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 36,
@@ -1201,7 +1201,7 @@
       "부동산세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 37,
@@ -1215,7 +1215,7 @@
       "거주요건"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 38,
@@ -1229,7 +1229,7 @@
       "2026"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 39,
@@ -1243,7 +1243,7 @@
       "매매타이밍"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 40,
@@ -1257,7 +1257,7 @@
       "공공임대"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 41,
@@ -1271,7 +1271,7 @@
       "LH"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 42,
@@ -1285,7 +1285,7 @@
       "주거복지"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 43,
@@ -1299,7 +1299,7 @@
       "부동산앱"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 44,
@@ -1313,7 +1313,7 @@
       "입주자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 45,
@@ -1327,7 +1327,7 @@
       "중개수수료"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 46,
@@ -1341,7 +1341,7 @@
       "정비사업"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 47,
@@ -1355,7 +1355,7 @@
       "분양가"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 48,
@@ -1369,7 +1369,7 @@
       "매매계약"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 49,
@@ -1383,7 +1383,7 @@
       "전세사기"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 50,
@@ -1397,7 +1397,7 @@
       "규제"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 1,
@@ -1411,7 +1411,7 @@
       "13월의월급"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 2,
@@ -1425,7 +1425,7 @@
       "세금신고"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 3,
@@ -1439,7 +1439,7 @@
       "부동산세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 4,
@@ -1453,7 +1453,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 5,
@@ -1467,7 +1467,7 @@
       "비과세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 6,
@@ -1481,7 +1481,7 @@
       "연납"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 7,
@@ -1495,7 +1495,7 @@
       "간이과세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 8,
@@ -1509,7 +1509,7 @@
       "환급"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 9,
@@ -1523,7 +1523,7 @@
       "추가공제"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 10,
@@ -1537,7 +1537,7 @@
       "임차"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 11,
@@ -1551,7 +1551,7 @@
       "공제"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 12,
@@ -1565,7 +1565,7 @@
       "카드사용"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 13,
@@ -1579,7 +1579,7 @@
       "공제"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 14,
@@ -1593,7 +1593,7 @@
       "취업"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 15,
@@ -1607,7 +1607,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 16,
@@ -1621,7 +1621,7 @@
       "재산이전"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 17,
@@ -1635,7 +1635,7 @@
       "생애최초"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 18,
@@ -1649,7 +1649,7 @@
       "부동산세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 19,
@@ -1663,7 +1663,7 @@
       "장부"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 20,
@@ -1677,7 +1677,7 @@
       "부가세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 21,
@@ -1691,7 +1691,7 @@
       "세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 22,
@@ -1705,7 +1705,7 @@
       "부동산세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 23,
@@ -1719,7 +1719,7 @@
       "부동산세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 24,
@@ -1733,7 +1733,7 @@
       "노후"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 25,
@@ -1747,7 +1747,7 @@
       "금융소득"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 26,
@@ -1761,7 +1761,7 @@
       "투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 27,
@@ -1775,7 +1775,7 @@
       "신고"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 28,
@@ -1789,7 +1789,7 @@
       "2027"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 29,
@@ -1803,7 +1803,7 @@
       "10년"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 30,
@@ -1817,7 +1817,7 @@
       "세금신고"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 31,
@@ -1831,7 +1831,7 @@
       "중복공제"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 32,
@@ -1845,7 +1845,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 33,
@@ -1859,7 +1859,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 34,
@@ -1873,7 +1873,7 @@
       "프리랜서"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 35,
@@ -1887,7 +1887,7 @@
       "건강보험"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 36,
@@ -1901,7 +1901,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 37,
@@ -1915,7 +1915,7 @@
       "세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 38,
@@ -1929,7 +1929,7 @@
       "세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 39,
@@ -1943,7 +1943,7 @@
       "사업자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 40,
@@ -1957,7 +1957,7 @@
       "세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 41,
@@ -1971,7 +1971,7 @@
       "세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 42,
@@ -1985,7 +1985,7 @@
       "홈택스"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 43,
@@ -1999,7 +1999,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 44,
@@ -2013,7 +2013,7 @@
       "사업자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 45,
@@ -2027,7 +2027,7 @@
       "세금구조"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 46,
@@ -2041,7 +2041,7 @@
       "IRP"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 47,
@@ -2055,7 +2055,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 48,
@@ -2069,7 +2069,7 @@
       "부동산증여"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 49,
@@ -2083,7 +2083,7 @@
       "세금비교"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 50,
@@ -2097,7 +2097,7 @@
       "세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 1,
@@ -2111,7 +2111,7 @@
       "협상전략"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 2,
@@ -2125,7 +2125,7 @@
       "퇴직연금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 3,
@@ -2139,7 +2139,7 @@
       "육아"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 4,
@@ -2153,7 +2153,7 @@
       "건강보험"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 5,
@@ -2167,7 +2167,7 @@
       "퇴사"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 6,
@@ -2181,7 +2181,7 @@
       "소득세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 7,
@@ -2195,7 +2195,7 @@
       "수령액"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 8,
@@ -2209,7 +2209,7 @@
       "휴가"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 9,
@@ -2223,7 +2223,7 @@
       "수당"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 10,
@@ -2237,7 +2237,7 @@
       "임금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 11,
@@ -2251,7 +2251,7 @@
       "수당"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 12,
@@ -2265,7 +2265,7 @@
       "연금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 13,
@@ -2279,7 +2279,7 @@
       "노후"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 14,
@@ -2293,7 +2293,7 @@
       "4대보험"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 15,
@@ -2307,7 +2307,7 @@
       "4대보험"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 16,
@@ -2321,7 +2321,7 @@
       "요양급여"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 17,
@@ -2335,7 +2335,7 @@
       "고용보험"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 18,
@@ -2349,7 +2349,7 @@
       "모성보호"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 19,
@@ -2363,7 +2363,7 @@
       "육아휴직급여"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 20,
@@ -2377,7 +2377,7 @@
       "4대보험"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 21,
@@ -2391,7 +2391,7 @@
       "환급"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 22,
@@ -2405,7 +2405,7 @@
       "이직확인서"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 23,
@@ -2419,7 +2419,7 @@
       "대응"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 24,
@@ -2433,7 +2433,7 @@
       "근로자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 25,
@@ -2447,7 +2447,7 @@
       "근로기준법"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 26,
@@ -2461,7 +2461,7 @@
       "임금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 27,
@@ -2475,7 +2475,7 @@
       "노동"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 28,
@@ -2489,7 +2489,7 @@
       "주의"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 29,
@@ -2503,7 +2503,7 @@
       "퇴사"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 30,
@@ -2517,7 +2517,7 @@
       "고용"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 31,
@@ -2531,7 +2531,7 @@
       "한도"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 32,
@@ -2545,7 +2545,7 @@
       "직장인"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 33,
@@ -2559,7 +2559,7 @@
       "세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 34,
@@ -2573,7 +2573,7 @@
       "직장인절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 35,
@@ -2587,7 +2587,7 @@
       "원천징수"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 36,
@@ -2601,7 +2601,7 @@
       "세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 37,
@@ -2615,7 +2615,7 @@
       "근무"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 38,
@@ -2629,7 +2629,7 @@
       "대출전략"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 39,
@@ -2643,7 +2643,7 @@
       "지역가입자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 40,
@@ -2657,7 +2657,7 @@
       "노후"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 41,
@@ -2671,7 +2671,7 @@
       "투자순서"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 42,
@@ -2685,7 +2685,7 @@
       "4대보험"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 43,
@@ -2699,7 +2699,7 @@
       "통장쪼개기"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 44,
@@ -2713,7 +2713,7 @@
       "임금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 45,
@@ -2727,7 +2727,7 @@
       "근로기준법"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 46,
@@ -2741,7 +2741,7 @@
       "재테크"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 47,
@@ -2755,7 +2755,7 @@
       "연금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 48,
@@ -2769,7 +2769,7 @@
       "근무제도"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 49,
@@ -2783,7 +2783,7 @@
       "복리후생"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 50,
@@ -2797,7 +2797,7 @@
       "노동정책"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 1,
@@ -2811,7 +2811,7 @@
       "투자우선순위"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 2,
@@ -2825,7 +2825,7 @@
       "투자입문"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 3,
@@ -2839,7 +2839,7 @@
       "월배당"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 4,
@@ -2853,7 +2853,7 @@
       "연말정산"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 5,
@@ -2867,7 +2867,7 @@
       "자산배분"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 6,
@@ -2881,7 +2881,7 @@
       "투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 7,
@@ -2895,7 +2895,7 @@
       "금리비교"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 8,
@@ -2909,7 +2909,7 @@
       "자산증식"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 9,
@@ -2923,7 +2923,7 @@
       "투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 10,
@@ -2937,7 +2937,7 @@
       "ETF"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 11,
@@ -2951,7 +2951,7 @@
       "투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 12,
@@ -2965,7 +2965,7 @@
       "투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 13,
@@ -2979,7 +2979,7 @@
       "투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 14,
@@ -2993,7 +2993,7 @@
       "안전자산"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 15,
@@ -3007,7 +3007,7 @@
       "안전자산"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 16,
@@ -3021,7 +3021,7 @@
       "노후"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 17,
@@ -3035,7 +3035,7 @@
       "노후"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 18,
@@ -3049,7 +3049,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 19,
@@ -3063,7 +3063,7 @@
       "세금"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 20,
@@ -3077,7 +3077,7 @@
       "주식"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 21,
@@ -3091,7 +3091,7 @@
       "투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 22,
@@ -3105,7 +3105,7 @@
       "ETF선택"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 23,
@@ -3119,7 +3119,7 @@
       "장기투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 24,
@@ -3133,7 +3133,7 @@
       "ETF"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 25,
@@ -3147,7 +3147,7 @@
       "현금흐름"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 26,
@@ -3161,7 +3161,7 @@
       "ETF"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 27,
@@ -3175,7 +3175,7 @@
       "노후"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 28,
@@ -3189,7 +3189,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 29,
@@ -3203,7 +3203,7 @@
       "저축"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 30,
@@ -3217,7 +3217,7 @@
       "재테크"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "비교형"
   },
   {
     "id": 31,
@@ -3231,7 +3231,7 @@
       "해외투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 32,
@@ -3245,7 +3245,7 @@
       "투자전략"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 33,
@@ -3259,7 +3259,7 @@
       "자산배분"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "케이스·대상별형"
   },
   {
     "id": 34,
@@ -3273,7 +3273,7 @@
       "평단가"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 35,
@@ -3287,7 +3287,7 @@
       "리스크관리"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 36,
@@ -3301,7 +3301,7 @@
       "절세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 37,
@@ -3315,7 +3315,7 @@
       "IRP"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 38,
@@ -3329,7 +3329,7 @@
       "투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 39,
@@ -3343,7 +3343,7 @@
       "양도소득세"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 40,
@@ -3357,7 +3357,7 @@
       "투자전략"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "완벽가이드형"
   },
   {
     "id": 41,
@@ -3371,7 +3371,7 @@
       "주식"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 42,
@@ -3385,7 +3385,7 @@
       "재테크"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 43,
@@ -3399,7 +3399,7 @@
       "ETF"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "함정주의형"
   },
   {
     "id": 44,
@@ -3413,7 +3413,7 @@
       "균등배정"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "개념정리형"
   },
   {
     "id": 45,
@@ -3427,7 +3427,7 @@
       "장기투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 46,
@@ -3441,7 +3441,7 @@
       "재무설계"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 47,
@@ -3455,7 +3455,7 @@
       "노후"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   },
   {
     "id": 48,
@@ -3469,7 +3469,7 @@
       "투자"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "꿀팁·리스트형"
   },
   {
     "id": 49,
@@ -3483,7 +3483,7 @@
       "주식"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "하우투·절차형"
   },
   {
     "id": 50,
@@ -3497,6 +3497,6 @@
       "시장전망"
     ],
     "status": "예정",
-    "archetype": null
+    "archetype": "트렌드·정책형"
   }
 ]

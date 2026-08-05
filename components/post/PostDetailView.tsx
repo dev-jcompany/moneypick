@@ -99,7 +99,7 @@ export default function PostDetailView({ post, popular, categoryPosts, canonical
       )}
 
       <div className="mx-auto max-w-[1500px] px-4 py-6 md:px-6 lg:px-4">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,800px)_280px] lg:justify-center xl:grid-cols-[minmax(760px,800px)_minmax(340px,360px)] xl:gap-8 widescreen:grid-cols-[760px_300px_minmax(280px,300px)]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,940px)_300px] lg:justify-center xl:grid-cols-[minmax(900px,980px)_minmax(320px,360px)] xl:gap-8 widescreen:grid-cols-[minmax(0,980px)_220px_minmax(240px,260px)] widescreen:gap-5">
 
           {/* ── LEFT: 기사 본문 ── */}
           <article className="min-w-0">
@@ -225,8 +225,8 @@ export default function PostDetailView({ post, popular, categoryPosts, canonical
                   <section className="mt-10 rounded-2xl border border-[#DDE5E1] bg-[#F6FBF8] p-5 md:p-6">
                     <p className="mb-1 text-[11px] font-bold uppercase tracking-widest text-[#21A05A]">관련 계산기</p>
                     <h3 className="mb-4 text-[16px] font-extrabold text-[#1A1D1F]">직접 계산해보세요</h3>
-                    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-                      {displayCalcs.slice(0, 3).map((calc) => (
+                    <div className="grid gap-2.5 sm:max-w-[320px]">
+                      {displayCalcs.slice(0, 1).map((calc) => (
                         <Link
                           key={calc.id}
                           href={`/calculators/${calc.slug}`}

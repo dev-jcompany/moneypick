@@ -35,6 +35,7 @@ const groups = [
     label: '뉴스레터',
     icon: '✉️',
     items: [
+      { href: adminPath('/inquiries'), label: '문의함' },
       { href: adminPath('/subscribers'), label: '구독자 목록' },
       { href: adminPath('/newsletter'), label: '발송 관리' },
     ],

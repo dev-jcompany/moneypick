@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/node_modules.install-*/
 /.pnp
 .pnp.*
 .yarn/*
@@ -22,6 +23,8 @@
 
 # misc
 .DS_Store
+Thumbs.db
+Desktop.ini
 *.pem
 
 # debug
@@ -32,9 +35,24 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
+
+# local editor and AI-tool settings
+.claude/
+
+# generated content previews and runtime caches
+/콘텐츠/
+/mcp/link-cache.json
+
+# temporary and backup files
+*.tmp
+*.temp
+*.bak
+*~
+*.swp
 
 # typescript
 *.tsbuildinfo

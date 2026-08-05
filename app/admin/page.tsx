@@ -29,7 +29,7 @@ export default function AdminDashboard() {
           </div>
           <p className="mt-4 text-sm leading-6 text-slate-500">글 작성은 아티클 관리 화면으로 통합되었습니다. 예전 콘텐츠 작성 화면으로 접근해도 새 글 작성 화면으로 이동합니다.</p>
         </section>
-        <section className="rounded-3xl bg-[#10231B] p-6 text-white shadow-sm"><h3 className="mb-2 text-lg font-extrabold">빠른 작업</h3><p className="mb-6 text-sm text-slate-400">자주 쓰는 메뉴로 바로 이동하세요.</p><div className="space-y-3"><Link href={adminPath('/articles/new')} className="block rounded-2xl bg-[#21A05A] p-4 font-bold">✎ 새 글 작성</Link><Link href={adminPath('/subscribers')} className="block rounded-2xl bg-white/10 p-4 font-bold hover:bg-white/15">✉ 구독자 명단 확인</Link><Link href={adminPath('/notices/new')} className="block rounded-2xl bg-white/10 p-4 font-bold hover:bg-white/15">● 공지사항 등록</Link></div></section>
+        <section className="rounded-3xl bg-[#10231B] p-6 text-white shadow-sm"><h3 className="mb-2 text-lg font-extrabold">빠른 작업</h3><p className="mb-6 text-sm text-slate-400">자주 쓰는 메뉴로 바로 이동하세요.</p><div className="space-y-3"><Link href={adminPath('/articles/new')} className="block rounded-2xl bg-[#21A05A] p-4 font-bold">✎ 새 글 작성</Link><Link href={adminPath('/inquiries')} className="block rounded-2xl bg-white/10 p-4 font-bold hover:bg-white/15">✉ 문의함 확인</Link><Link href={adminPath('/subscribers')} className="block rounded-2xl bg-white/10 p-4 font-bold hover:bg-white/15">✉ 구독자 명단 확인</Link><Link href={adminPath('/notices/new')} className="block rounded-2xl bg-white/10 p-4 font-bold hover:bg-white/15">● 공지사항 등록</Link></div></section>
       </div>
     </div>
   );

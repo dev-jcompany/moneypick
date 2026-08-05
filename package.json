@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "security:env": "node mcp/check-env.cjs",
     "mcp:draft": "node mcp/moneypick-draft-agent.mjs",
     "lint": "eslint"
   },

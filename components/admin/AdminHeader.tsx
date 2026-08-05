@@ -8,6 +8,7 @@ const titleMap: Record<string, string> = {
   [adminPath('/articles')]: '글 목록',
   [adminPath('/articles/new')]: '새 글 작성',
   [adminPath('/categories')]: '카테고리 설정',
+  [adminPath('/inquiries')]: '문의함',
   [adminPath('/subscribers')]: '뉴스레터 신청자 관리',
   [adminPath('/notices')]: '공지사항 목록',
   [adminPath('/notices/new')]: '공지사항 등록',

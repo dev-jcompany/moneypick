@@ -4,8 +4,7 @@ const footerLinks = [
   { href: '/about', label: '회사소개' },
   { href: '/terms', label: '이용약관' },
   { href: '/privacy', label: '개인정보처리방침' },
-  { href: '/contact', label: '광고문의' },
-  { href: '/contact', label: '제휴문의' },
+  { href: '/contact', label: '광고·제휴문의' },
   { href: '/disclaimer', label: '면책조항' },
 ];
 
@@ -20,7 +19,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#0D1928] text-white py-10">
-      <div className="max-w-[1200px] mx-auto px-4">
+      <div className="max-w-[1500px] mx-auto px-4">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8">
           {/* Brand */}
           <div className="flex items-center gap-2.5">

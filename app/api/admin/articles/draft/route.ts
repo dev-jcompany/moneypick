@@ -23,6 +23,9 @@ type DraftRequestBody = {
   readingTime?: unknown;
   metaDescription?: unknown;
   thumbnailUrl?: unknown;
+  articleType?: unknown;
+  patternId?: unknown;
+  relatedSlugs?: unknown;
 };
 
 const CATEGORY_MAP: Record<string, { key: string; label: string }> = {
@@ -183,7 +186,7 @@ export async function POST(req: NextRequest) {
       lead,
       meta_description: metaDescription,
       body_html: contentHtml.value,
-      summary: [lead],
+      summary: [],
       faq: [],
       tags,
       editor: source === 'claude_desktop' ? 'Claude Desktop' : '머니픽 에디터',
@@ -195,6 +198,11 @@ export async function POST(req: NextRequest) {
       thumbnail_url: thumbnailUrl,
       status: 'draft',
       source,
+      article_type: optionalString(body.articleType),
+      pattern_id: optionalString(body.patternId),
+      recommended_slugs: Array.isArray(body.relatedSlugs)
+        ? (body.relatedSlugs as unknown[]).filter((s): s is string => typeof s === 'string').slice(0, 10)
+        : null,
     };
 
     const result = await createMoneypickArticle(payload);

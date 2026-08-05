@@ -56,6 +56,8 @@ export interface MoneypickArticleRow {
   thumbnail_url: string | null;
   status: 'draft' | 'published';
   source?: string | null;
+  article_type?: string | null;
+  pattern_id?: string | null;
   views: number;
   created_at: string;
   updated_at: string;

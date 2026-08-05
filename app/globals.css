@@ -447,6 +447,58 @@ body {
   color: #fde68a;
 }
 
+/* ── 공식 확인처 섹션 (mp-official-sources) ── */
+.mp-body-html .mp-official-sources {
+  margin: 3rem 0 0;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--mp-line, #e5e7eb);
+  border-radius: 0.75rem;
+  background: var(--mp-bg, #fafafa);
+}
+:where(.dark, .dark *) .mp-body-html .mp-official-sources {
+  border-color: var(--mp-line, #112236);
+  background: var(--mp-bg, #0b1829);
+}
+.mp-body-html .mp-official-sources h2 {
+  margin: 0 0 1rem;
+  padding-left: 0;
+  border-left: none;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--mp-ink, #1a1d1b);
+}
+.mp-body-html .mp-official-sources ul {
+  margin: 0 0 0.875rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.mp-body-html .mp-official-sources li {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--mp-sub, #6b756e);
+}
+.mp-body-html .mp-official-sources li strong { font-weight: 600; }
+.mp-body-html .mp-official-sources a {
+  color: var(--mp-accent, #21a05a);
+  text-decoration: none;
+}
+.mp-body-html .mp-official-sources a:hover { text-decoration: underline; }
+.mp-official-sources-date {
+  margin: 0 0 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--mp-sub, #6b756e);
+}
+.mp-official-sources-note {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--mp-sub, #6b756e);
+  line-height: 1.6;
+}
+
 .mp-article-hero-image {
   background-position: center, right top, center;
   background-repeat: no-repeat, no-repeat, no-repeat;

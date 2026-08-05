@@ -18,7 +18,7 @@ export default function Header() {
 
   return (
     <header className="bg-white dark:bg-navy-900 border-b border-[#E8ECEF] dark:border-navy-700 sticky top-0 z-50">
-      <div className="max-w-[1200px] mx-auto px-4 py-3 grid grid-cols-[auto_1fr_auto] items-center gap-4">
+      <div className="max-w-[1500px] mx-auto px-4 py-3 grid grid-cols-[auto_1fr_auto] items-center gap-4">
         {/* Left: Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="머니픽 홈">
           <MoneyPickLogo />

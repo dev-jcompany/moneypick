@@ -69,6 +69,18 @@ alter table moneypick_articles
 alter table moneypick_articles
   add column if not exists source text;
 
+-- 기사 유형(GUIDE/COMPARISON/CASE_STUDY/CHECKLIST/CALCULATOR_FOCUSED/POLICY_CHANGE)과
+-- 구성 패턴 id(예: GUIDE_01) — 자동 생성 글의 구성 다양화 및 중복 방지 참고용.
+alter table moneypick_articles
+  add column if not exists article_type text;
+
+alter table moneypick_articles
+  add column if not exists pattern_id text;
+
+-- 추천 글 slug 목록 (자동 생성 시 내부링크 캐시 기반으로 채워짐, 향후 페이지 렌더링 활용)
+alter table moneypick_articles
+  add column if not exists recommended_slugs text[] default '{}';
+
 -- 기존 5개 카테고리만 허용하던 category_key check constraint를 제거합니다.
 do $$
 declare
@@ -103,7 +115,29 @@ create trigger moneypick_categories_updated_at
   before update on moneypick_categories
   for each row execute function update_updated_at();
 
+create table if not exists contact_inquiries (
+  id            uuid primary key default gen_random_uuid(),
+  type          text not null check (type in ('advertising_partnership', 'article_tip', 'correction', 'general')),
+  sender_email  text not null,
+  sender_name   text,
+  title         text not null,
+  message       text not null,
+  status        text not null default 'new' check (status in ('new', 'read', 'archived')),
+  referer       text,
+  user_agent    text,
+  created_at    timestamptz default now(),
+  updated_at    timestamptz default now()
+);
+
+drop trigger if exists contact_inquiries_updated_at on contact_inquiries;
+
+create trigger contact_inquiries_updated_at
+  before update on contact_inquiries
+  for each row execute function update_updated_at();
+
 alter table moneypick_categories enable row level security;
+alter table moneypick_articles enable row level security;
+alter table contact_inquiries enable row level security;
 
 drop policy if exists "moneypick categories public read" on moneypick_categories;
 create policy "moneypick categories public read"
@@ -111,20 +145,26 @@ create policy "moneypick categories public read"
   using (true);
 
 drop policy if exists "moneypick categories public insert" on moneypick_categories;
-create policy "moneypick categories public insert"
-  on moneypick_categories for insert
-  with check (true);
 
 drop policy if exists "moneypick categories public update" on moneypick_categories;
-create policy "moneypick categories public update"
-  on moneypick_categories for update
-  using (true)
-  with check (true);
 
 drop policy if exists "moneypick categories public delete" on moneypick_categories;
-create policy "moneypick categories public delete"
-  on moneypick_categories for delete
-  using (true);
+
+drop policy if exists "published moneypick articles public read" on moneypick_articles;
+create policy "published moneypick articles public read"
+  on moneypick_articles for select to anon
+  using (status = 'published');
+
+drop policy if exists "contact inquiries public insert" on contact_inquiries;
+create policy "contact inquiries public insert"
+  on contact_inquiries for insert to anon
+  with check (
+    type in ('advertising_partnership', 'article_tip', 'correction', 'general')
+    and char_length(sender_email) between 3 and 160
+    and char_length(title) between 2 and 120
+    and char_length(message) between 10 and 3000
+    and status = 'new'
+  );
 
 -- 대표 이미지 업로드용 Storage 버킷
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -147,12 +187,7 @@ create policy "article images public read"
   using (bucket_id = 'article-images');
 
 drop policy if exists "article images public upload" on storage.objects;
-create policy "article images public upload"
-  on storage.objects for insert
-  with check (bucket_id = 'article-images');
 
 drop policy if exists "article images public update" on storage.objects;
-create policy "article images public update"
-  on storage.objects for update
-  using (bucket_id = 'article-images')
-  with check (bucket_id = 'article-images');
+
+drop policy if exists "article images public delete" on storage.objects;

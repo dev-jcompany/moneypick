@@ -128,10 +128,10 @@ export default async function CategoryContentPage({ params }: Props) {
   ]);
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-5 md:pb-14 md:pt-6">
+    <div className="mx-auto max-w-[1500px] px-4 pb-10 pt-5 md:pb-14 md:pt-6">
       <Breadcrumb items={[{ label: article.categoryLabel, href: `/${getArticleCategoryPath(article.categoryKey)}` }, { label: article.title }]} />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,760px)_280px] xl:gap-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,940px)_300px] lg:justify-center xl:grid-cols-[minmax(900px,980px)_minmax(320px,360px)] xl:gap-8 widescreen:grid-cols-[minmax(0,980px)_220px_minmax(240px,260px)] widescreen:gap-5">
         <main className="min-w-0">
           <MoneyPickArticle {...article} />
         </main>

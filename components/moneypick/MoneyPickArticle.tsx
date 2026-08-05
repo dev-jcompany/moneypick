@@ -97,6 +97,29 @@ function won(n: number) {
   return n.toLocaleString('ko-KR');
 }
 
+function normalizeSummaryText(value: string) {
+  return value
+    .replace(/\*\*/g, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getVisibleSummary(summary: string[] | undefined, lead: string) {
+  const normalizedLead = normalizeSummaryText(lead);
+  const seen = new Set<string>();
+
+  return (summary ?? [])
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .filter((item) => {
+      const normalizedItem = normalizeSummaryText(item);
+      if (!normalizedItem || normalizedItem === normalizedLead || seen.has(normalizedItem)) return false;
+      seen.add(normalizedItem);
+      return true;
+    });
+}
+
 export default function MoneyPickArticle(props: MoneyPickArticleProps) {
   const {
     categoryKey, categoryLabel, title, date, updateDate, readingTime, views,
@@ -113,6 +136,7 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
   const faqItems = (blocks ?? [])
     .filter((b): b is Extract<ArticleBlock, { type: 'faq' }> => b.type === 'faq')
     .flatMap((b) => b.items);
+  const visibleSummary = getVisibleSummary(summary, lead);
 
   return (
     <article
@@ -158,11 +182,11 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
       </header>
 
       {/* ── 핵심 요약 박스 ── */}
-      {summary && summary.length > 0 && (
+      {visibleSummary.length > 0 && (
         <section className="border-b border-[#d4eddf] bg-[#f0faf5] px-6 py-5 dark:border-green-900/30 dark:bg-green-900/20 md:px-12">
           <p className="mb-3 text-[15px] font-extrabold" style={{ color: theme.accentDark }}>핵심 요약</p>
           <ul className="space-y-2">
-            {summary.map((s, i) => (
+            {visibleSummary.map((s, i) => (
               <li key={i} className="flex items-start gap-2.5 text-[15px] leading-[1.7] text-[#1c3b29] dark:text-slate-200">
                 <span className="mt-0.5 flex-none text-[16px] font-extrabold" style={{ color: theme.accent }}>✓</span>
                 {renderInline(s)}
@@ -192,7 +216,7 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
           <section className="mt-10 rounded-2xl border border-[#c8e8d4] bg-[#f0faf5] p-6 dark:border-green-900/30 dark:bg-green-900/15">
             <p className="mb-4 text-[17px] font-extrabold text-[#1a1d1b] dark:text-white">이 글과 관련된 계산기</p>
             <div className="flex flex-wrap gap-3">
-              {relatedCalculators.map((calc, i) => (
+              {relatedCalculators.slice(0, 1).map((calc, i) => (
                 <a key={i} href={calc.href}
                    className="inline-flex items-center gap-2 rounded-xl border border-[#1f9d57] bg-white px-4 py-2.5 text-[15px] font-semibold text-[#1f9d57] transition hover:bg-[#1f9d57] hover:text-white dark:bg-navy-800 dark:hover:bg-[#1f9d57]">
                   🧮 {calc.label}

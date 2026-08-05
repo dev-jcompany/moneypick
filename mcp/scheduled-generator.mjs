@@ -13,6 +13,27 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { generateThumbnail } from './thumbnail-generator.mjs';
+import {
+  selectArticleType,
+  pickPattern,
+  pickTitleStyle,
+  buildPatternPromptBlock,
+  logSelection,
+} from './pattern-selector.mjs';
+import {
+  generateSampleScenarios,
+  formatResultValue,
+  SCENARIO_SUPPORTED_CALCULATORS,
+} from '../lib/calculators/engine.mjs';
+import { matchSources } from './official-registry.mjs';
+import {
+  loadLinkCache,
+  saveLinkCache,
+  addToLinkCache,
+  matchRecommended,
+  buildRecommendedBlock,
+  toArticleUrl,
+} from './link-cache.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,7 +55,8 @@ loadEnv(path.join(__dirname, '..', '.env.local'));
 
 // ── CLI ──
 const args = process.argv.slice(2);
-const DRY = args.includes('--dry');
+const DRY   = args.includes('--dry');
+const DEBUG = args.includes('--debug');
 const LIMIT = (() => {
   const i = args.indexOf('--limit');
   return i !== -1 ? Number(args[i + 1]) : 6;
@@ -49,7 +71,9 @@ const TOPICS_PATH = path.join(__dirname, 'topics.json');
 const STATE_PATH  = path.join(__dirname, 'schedule-state.json'); // 진행 상태
 const SYSTEM_PROMPT_PATH = path.join(__dirname, 'system-prompt.md');
 const SAMPLES_DIR = path.join(__dirname, 'samples');
+const PATTERNS_PATH = path.join(__dirname, 'article-patterns.json');
 const SLEEP_MS = 2000;
+const HISTORY_LIMIT = 30; // 패턴/제목스타일 중복 방지용 최근 이력 보관 개수
 
 // ── 글유형별 스켈레톤 리마인더 ──
 const SKELETON = {
@@ -71,12 +95,35 @@ function loadJson(p) {
 }
 
 function loadState() {
-  if (!fs.existsSync(STATE_PATH)) return { generated: [] };
-  return loadJson(STATE_PATH);
+  if (!fs.existsSync(STATE_PATH)) return { generated: [], history: [] };
+  const state = loadJson(STATE_PATH);
+  return {
+    ...state,
+    generated: Array.isArray(state.generated) ? state.generated : [],
+    history: Array.isArray(state.history) ? state.history : [],
+  };
 }
 
 function saveState(state) {
+  state.generated = Array.from(new Set(state.generated));
+  state.history = state.history.slice(-HISTORY_LIMIT);
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+}
+
+function topicKey(topic) {
+  return `${topic.category}:${topic.id}`;
+}
+
+function generatedSet(state) {
+  const done = new Set();
+  for (const value of state.generated) {
+    if (typeof value === 'number') {
+      done.add(`대출연구소:${value}`);
+    } else if (typeof value === 'string') {
+      done.add(value);
+    }
+  }
+  return done;
 }
 
 function charCount(html) {
@@ -93,9 +140,9 @@ function metaCharCount(value) {
 
 // ── 생성 대상 선택 ──
 function pickTargets(topics, state, limit) {
-  const done = new Set(state.generated);
+  const done = generatedSet(state);
   return topics
-    .filter(t => t.archetype && t.status === '예정' && !done.has(t.id))
+    .filter(t => t.archetype && t.status === '예정' && !done.has(topicKey(t)))
     .slice(0, limit);
 }
 
@@ -129,6 +176,83 @@ function siblingTitles(topics, topic) {
     .filter(t => t.category === topic.category && t.id !== topic.id)
     .map(t => t.title)
     .slice(0, 12);
+}
+
+// ── 사례 자동 생성 (Phase 2 ①) ──
+// AI가 숫자를 지어내지 않도록, 실제 계산기 공식으로 미리 계산한 사례를 프롬프트에 주입한다.
+// topics.json에는 relatedCalculators 필드가 없으므로(그건 AI 출력 스키마 쪽 필드),
+// 제목+planTags 키워드로 관련 계산기를 추정한다. 순서가 우선순위(먼저 매칭되는 것 사용).
+const CALCULATOR_KEYWORDS = {
+  dsr: ['DSR'],
+  'acquisition-tax': ['취득세'],
+  'jeonse-loan': ['전세자금대출', '전세대출'],
+  mortgage: ['주택담보대출', '담보대출'],
+};
+
+function detectScenarioCalculator(topic) {
+  const text = [topic.title, ...(topic.planTags || [])].filter(Boolean).join(' ');
+  for (const slug of SCENARIO_SUPPORTED_CALCULATORS) {
+    const keywords = CALCULATOR_KEYWORDS[slug] || [];
+    if (keywords.some((kw) => text.includes(kw))) return slug;
+  }
+  return null;
+}
+
+function buildScenarioBlock(topic) {
+  const slug = detectScenarioCalculator(topic);
+  if (!slug) return null;
+
+  const scenarios = generateSampleScenarios(slug);
+  if (!scenarios.length) return null;
+
+  const lines = scenarios.map((sc, i) => {
+    const resultText = sc.results.map((r) => `${r.label} ${formatResultValue(r)}`).join(', ');
+    return `  ${i + 1}) ${sc.name} → ${resultText}`;
+  });
+
+  return {
+    slug,
+    scenarioNames: scenarios.map((s) => s.name),
+    block: [
+      `[실제 계산된 사례 데이터 — 숫자를 새로 지어내지 말고 반드시 이 값을 그대로 사용할 것]`,
+      `아래는 '${slug}' 계산기 공식으로 실제로 계산한 결과입니다. 이 중 최소 2개를 골라 실제 사람의 상황처럼 자연스럽게 풀어서 서술하세요(숫자를 다시 계산하거나 변형하지 마세요).`,
+      ...lines,
+    ].join('\n'),
+  };
+}
+
+// ── 공식 확인처 자동 연결 (v1) ──
+function buildSourcesPromptBlock(matched) {
+  if (!matched.length) return null;
+  const list = matched.map(a => `  - ${a.name} (${a.url}): ${a.description}`).join('\n');
+  return [
+    `[공식 확인처 안내 — 아래 기관 정보를 참고하되 다음 규칙을 반드시 지킬 것]`,
+    `독자가 추가 확인할 수 있는 공식 기관입니다. 이 기관들이 직접 검증하지 않은 사실을 "기관이 발표했다", "공식 자료에 따르면"이라고 단정하지 마세요.`,
+    `제공된 기관명·URL 외의 기관명이나 URL을 임의로 만들지 마세요.`,
+    `정책·금리·세율·지원 조건처럼 변경 가능한 정보에는 "기준일 기준" 또는 "[확인 필요]" 마커를 활용하세요.`,
+    `기관 링크를 본문에 반복 삽입하지 마세요. 공식 확인처 섹션은 시스템이 자동으로 추가합니다.`,
+    `관련 공식 기관:`,
+    list,
+  ].join('\n');
+}
+
+function buildSourcesHtml(matched, dateStr) {
+  if (!matched.length) return '';
+  const items = matched
+    .map(a =>
+      `<li><a href="${a.url}" target="_blank" rel="noopener noreferrer"><strong>${a.name}</strong></a><br>${a.description}</li>`,
+    )
+    .join('\n');
+  return [
+    `<div class="mp-official-sources">`,
+    `<h2>공식 확인처</h2>`,
+    `<ul>`,
+    items,
+    `</ul>`,
+    `<p class="mp-official-sources-date">기준일: ${dateStr}</p>`,
+    `<p class="mp-official-sources-note">정책과 세부 조건은 변경될 수 있으므로 신청 또는 의사결정 전에 공식 기관의 최신 내용을 확인하세요.</p>`,
+    `</div>`,
+  ].join('\n');
 }
 
 function buildUserPrompt(topic, siblings) {
@@ -174,7 +298,7 @@ function validate(obj) {
 }
 
 // ── Claude API 호출 ──
-async function generateDraft(client, systemPrompt, topic, topics, samples) {
+async function generateDraft(client, systemPrompt, topic, topics, samples, extraBlocks = []) {
   const shots = pickShots(samples, topic.archetype);
   const messages = [];
   for (const s of shots) {
@@ -183,7 +307,9 @@ async function generateDraft(client, systemPrompt, topic, topics, samples) {
     messages.push({ role: 'user',      content: buildUserPrompt(fakeTopic, (s.recommended||[]).map(r=>r.title)) });
     messages.push({ role: 'assistant', content: JSON.stringify(s) });
   }
-  messages.push({ role: 'user', content: buildUserPrompt(topic, siblingTitles(topics, topic)) });
+  const targetPrompt = buildUserPrompt(topic, siblingTitles(topics, topic));
+  const fullPrompt = [targetPrompt, ...extraBlocks.filter(Boolean)].join('\n\n');
+  messages.push({ role: 'user', content: fullPrompt });
 
   const resp = await client.messages.create({
     model: MODEL,
@@ -258,6 +384,11 @@ async function postDraft(obj, thumbnailUrl) {
       contentHtml:     obj.bodyHtml,
       tags:            obj.tags ?? [],
       thumbnailUrl:    thumbnailUrl ?? null,
+      articleType:     obj.articleType ?? null,
+      patternId:       obj.patternId ?? null,
+      relatedSlugs:    Array.isArray(obj.recommended)
+                         ? obj.recommended.map(r => r?.slug).filter(Boolean)
+                         : [],
       status:          'draft',
       source:          'claude_scheduled',
     }),
@@ -270,15 +401,16 @@ async function postDraft(obj, thumbnailUrl) {
 
 // ── 메인 ──
 async function main() {
-  const topics       = loadJson(TOPICS_PATH);
-  const state        = loadState();
-  const systemPrompt = fs.readFileSync(SYSTEM_PROMPT_PATH, 'utf8');
-  const samples      = loadSamples();
-  const targets      = pickTargets(topics, state, LIMIT);
+  const topics         = loadJson(TOPICS_PATH);
+  const state          = loadState();
+  const systemPrompt   = fs.readFileSync(SYSTEM_PROMPT_PATH, 'utf8');
+  const samples        = loadSamples();
+  const patternsConfig = loadJson(PATTERNS_PATH);
+  const targets        = pickTargets(topics, state, LIMIT);
 
   const total   = topics.filter(t => t.archetype && t.status === '예정').length;
-  const done    = state.generated.length;
-  const remain  = total - done;
+  const done    = generatedSet(state).size;
+  const remain  = Math.max(total - done, 0);
 
   console.log(`\n머니픽 스케줄 생성기 — ${new Date().toLocaleString('ko-KR')}`);
   console.log(`전체 생성 가능: ${total}개 / 완료: ${done}개 / 남은: ${remain}개`);
@@ -289,8 +421,27 @@ async function main() {
     return;
   }
 
+  const linkCache = loadLinkCache();
+  console.log(`내부링크 캐시: ${linkCache.length}개 항목`);
+
   if (DRY) {
-    targets.forEach(t => console.log(`· (dry) #${t.id} [${t.archetype}] ${t.title}`));
+    const previewHistory = state.history.slice();
+    targets.forEach(t => {
+      const typeResult = selectArticleType(t);
+      const { patternId, pattern } = pickPattern(typeResult.articleType, previewHistory, patternsConfig);
+      const titleStyle = pickTitleStyle(previewHistory);
+      console.log(`\n· (dry) #${t.id} [${t.archetype}] ${t.title}`);
+      logSelection({ topic: t, typeResult, patternId, pattern, titleStyle });
+      const scenario = buildScenarioBlock(t);
+      console.log(`scenarios: ${scenario ? `${scenario.slug} → ${scenario.scenarioNames.join(' / ')}` : '(해당 계산기 프리셋 없음)'}`);
+      const dryMatched = matchSources(t);
+      console.log(`sources: ${dryMatched.length ? dryMatched.map(a => a.name).join(', ') : '(매칭 없음)'}`);
+      const dryScenario = buildScenarioBlock(t);
+      const dryCalcSlugs = dryScenario?.slug ? [dryScenario.slug] : [];
+      const dryCandidates = matchRecommended(t, linkCache, 5, null, dryCalcSlugs, DEBUG);
+      console.log(`recommended 후보(${dryCandidates.length}개): ${dryCandidates.length ? dryCandidates.map(c => c.slug).join(', ') : '(캐시 없음 — 기존 방식)'}`);
+      previewHistory.push({ topicKey: topicKey(t), articleType: typeResult.articleType, patternId, titleStyle });
+    });
     return;
   }
 
@@ -306,19 +457,58 @@ async function main() {
     const label = `#${topic.id} [${topic.archetype}] ${topic.title}`;
     let lastErr;
 
+    // 기사 유형 / 패턴 / 제목 스타일 선택 (재시도해도 동일 선택 유지)
+    const typeResult  = selectArticleType(topic);
+    const { patternId, pattern } = pickPattern(typeResult.articleType, state.history, patternsConfig);
+    const titleStyle  = pickTitleStyle(state.history);
+    const patternBlock = buildPatternPromptBlock(typeResult.articleType, patternId, pattern, titleStyle);
+    logSelection({ topic, typeResult, patternId, pattern, titleStyle });
+
+    // 사례 자동 생성: 실제 계산기 공식으로 미리 계산한 값을 프롬프트에 주입 (있는 경우만)
+    const scenario = buildScenarioBlock(topic);
+    console.log(`scenarios: ${scenario ? `${scenario.slug} → ${scenario.scenarioNames.join(' / ')}` : '(해당 계산기 프리셋 없음)'}`);
+
+    // 공식 확인처 매칭 (재시도 루프 밖에서 한 번만 수행)
+    const matchedSources = matchSources(topic);
+    const sourcesBlock = buildSourcesPromptBlock(matchedSources);
+    if (matchedSources.length) {
+      console.log(`sources: ${matchedSources.map(a => a.name).join(', ')}`);
+    }
+
+    // 내부링크 추천 후보 (실제 생성된 글 슬러그 기반)
+    const scenarioSlug = scenario?.slug ? [scenario.slug] : [];
+    const linkCandidates = matchRecommended(topic, linkCache, 5, null, scenarioSlug, DEBUG);
+    const recommendedBlock = buildRecommendedBlock(linkCandidates);
+    if (DEBUG) {
+      console.log(`[DEBUG] 캐시 크기: ${linkCache.length}개`);
+      console.log(`[DEBUG] 계산기 힌트: ${scenarioSlug.join(', ') || '없음'}`);
+      console.log(`[DEBUG] 최종 추천 후보: ${linkCandidates.length}개`);
+    }
+    if (linkCandidates.length) {
+      console.log(`recommended 후보(${linkCandidates.length}개): ${linkCandidates.map(c => c.slug).join(', ')}`);
+    }
+
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         // 1) 생성
-        const obj = await generateDraft(client, systemPrompt, topic, topics, samples);
+        const obj = await generateDraft(client, systemPrompt, topic, topics, samples, [patternBlock, scenario?.block, sourcesBlock, recommendedBlock]);
         obj.id       = topic.id;
         if (!obj.metaDescription && obj.meta_description) obj.metaDescription = obj.meta_description;
         obj.category = topic.category;
         obj.archetype = topic.archetype;
+        obj.articleType = typeResult.articleType;
+        obj.patternId   = patternId;
         obj.status   = 'draft';
         if (metaCharCount(obj.metaDescription) < 120 || metaCharCount(obj.metaDescription) > 180) {
           obj.metaDescription = await repairMetaDescription(client, obj);
         }
         validate(obj);
+
+        // 공식 확인처 HTML을 bodyHtml 끝에 append (validate 이후이므로 검증 영향 없음)
+        if (matchedSources.length) {
+          const dateStr = new Date().toISOString().slice(0, 10);
+          obj.bodyHtml += '\n' + buildSourcesHtml(matchedSources, dateStr);
+        }
 
         // 2) 썸네일 생성 (실패해도 글 등록은 계속)
         let thumbnailUrl = null;
@@ -341,8 +531,31 @@ async function main() {
         console.log(`  → articleId: ${saved.articleId} | ${cc}자${flag}${thumbnailUrl ? ' | 🖼️' : ''}`);
         console.log(`  → ${saved.editUrl}`);
 
-        state.generated.push(topic.id);
+        state.generated.push(topicKey(topic));
+        state.history.push({
+          topicKey: topicKey(topic),
+          articleType: typeResult.articleType,
+          patternId,
+          titleStyle,
+          generatedAt: new Date().toISOString(),
+        });
         saveState(state);
+
+        // 내부링크 캐시에 이번 글 추가 (다음 생성 시 recommended 후보로 사용)
+        const calcSlugs = (obj.relatedCalculators ?? [])
+          .map(s => (typeof s === 'string' ? s : null))
+          .filter(Boolean);
+        addToLinkCache(linkCache, {
+          slug: obj.slug,
+          title: obj.title,
+          categoryLabel: topic.category,
+          tags: obj.tags ?? [],
+          calcSlugs,
+          views: 0,
+          publishedAt: new Date().toISOString().slice(0, 10),
+        });
+        saveLinkCache(linkCache);
+
         results.success.push(topic.id);
         lastErr = null;
         break;
