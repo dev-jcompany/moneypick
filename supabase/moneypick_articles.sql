@@ -156,15 +156,6 @@ create policy "published moneypick articles public read"
   using (status = 'published');
 
 drop policy if exists "contact inquiries public insert" on contact_inquiries;
-create policy "contact inquiries public insert"
-  on contact_inquiries for insert to anon
-  with check (
-    type in ('advertising_partnership', 'article_tip', 'correction', 'general')
-    and char_length(sender_email) between 3 and 160
-    and char_length(title) between 2 and 120
-    and char_length(message) between 10 and 3000
-    and status = 'new'
-  );
 
 -- 대표 이미지 업로드용 Storage 버킷
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

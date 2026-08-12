@@ -68,15 +68,6 @@ begin
   if to_regclass('public.moneypick_articles') is not null then
     execute 'create policy "published moneypick articles public read" on public.moneypick_articles for select to anon using (status = ''published'')';
   end if;
-  if to_regclass('public.contact_inquiries') is not null then
-    execute 'create policy "contact inquiries public insert" on public.contact_inquiries for insert to anon with check (
-      type in (''advertising_partnership'', ''article_tip'', ''correction'', ''general'')
-      and char_length(sender_email) between 3 and 160
-      and char_length(title) between 2 and 120
-      and char_length(message) between 10 and 3000
-      and status = ''new''
-    )';
-  end if;
 end
 $$;
 

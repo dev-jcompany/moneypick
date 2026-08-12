@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import { randomUUID } from 'node:crypto';
 import type { Category, Post } from '@/src/types';
 import type { MoneypickArticleRow, MoneyPickArticleProps, CategoryKey } from '@/components/moneypick/types';
 import { normalizeRelatedCalculators } from '@/lib/article-calculators';
@@ -7,9 +6,6 @@ import { allPosts, popularPosts, latestPosts } from '@/src/data/posts';
 import { categories as staticCategories } from '@/src/data/categories';
 import { notices as staticNotices } from '@/src/data/notices';
 import type { ContactInquiryType } from '@/lib/contact-inquiries';
-
-const CONTACT_INQUIRY_STORAGE_BUCKET = 'contact-inquiries';
-const CONTACT_INQUIRY_STORAGE_PREFIX = 'inquiries';
 
 function client() {
   return createClient(
@@ -19,11 +15,13 @@ function client() {
 }
 
 function serverClient() {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!serviceRoleKey) {
+    throw new Error('[security] SUPABASE_SERVICE_ROLE_KEY is required for server database operations.');
+  }
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      process.env.SUPABASE_SERVICE_KEY ||
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    serviceRoleKey,
   );
 }
 
@@ -543,138 +541,7 @@ export type ContactInquiry = ContactInquiryPayload & {
   user_agent: string | null;
   created_at: string;
   updated_at?: string | null;
-  storage_path?: string | null;
 };
-
-function isMissingContactTable(error: { code?: string; message?: string } | null) {
-  const message = error?.message ?? '';
-  return error?.code === 'PGRST205' || error?.code === '42P01' || message.includes('contact_inquiries');
-}
-
-function safeStorageFileName(value: string) {
-  return value.replace(/[^a-zA-Z0-9_.-]/g, '-');
-}
-
-async function ensureContactInquiryBucket(supabase = serverClient()) {
-  const { error } = await supabase.storage.createBucket(CONTACT_INQUIRY_STORAGE_BUCKET, {
-    public: false,
-    fileSizeLimit: 1024 * 1024,
-    allowedMimeTypes: ['application/json'],
-  });
-
-  if (error && !/already exists|Duplicate/i.test(error.message)) {
-    console.error('[db] ensureContactInquiryBucket:', error.message);
-  }
-}
-
-function buildStoredContactInquiry(
-  payload: ContactInquiryPayload,
-  meta: { referer?: string | null; user_agent?: string | null },
-): ContactInquiry {
-  const now = new Date().toISOString();
-  return {
-    ...payload,
-    id: randomUUID(),
-    status: 'new',
-    referer: meta.referer ?? null,
-    user_agent: meta.user_agent ?? null,
-    created_at: now,
-    updated_at: now,
-  };
-}
-
-async function createContactInquiryInStorage(
-  payload: ContactInquiryPayload,
-  meta: { referer?: string | null; user_agent?: string | null } = {},
-): Promise<{ id: string | null; error?: string; code?: string }> {
-  try {
-    const supabase = serverClient();
-    await ensureContactInquiryBucket(supabase);
-
-    const inquiry = buildStoredContactInquiry(payload, meta);
-    const datePrefix = inquiry.created_at.slice(0, 10);
-    const path = `${CONTACT_INQUIRY_STORAGE_PREFIX}/${datePrefix}/${safeStorageFileName(inquiry.created_at)}-${inquiry.id}.json`;
-
-    const { error } = await supabase.storage
-      .from(CONTACT_INQUIRY_STORAGE_BUCKET)
-      .upload(path, JSON.stringify(inquiry, null, 2), {
-        contentType: 'application/json',
-        upsert: false,
-      });
-
-    if (error) {
-      console.error('[db] createContactInquiryInStorage upload:', error.message);
-      return { id: null, error: error.message, code: 'STORAGE_UPLOAD_FAILED' };
-    }
-    return { id: inquiry.id };
-  } catch (e) {
-    console.error('[db] createContactInquiryInStorage exception:', e);
-    return { id: null, error: e instanceof Error ? e.message : 'Unknown error', code: 'STORAGE_EXCEPTION' };
-  }
-}
-
-function isContactInquiry(value: unknown): value is ContactInquiry {
-  if (!value || typeof value !== 'object') return false;
-  const inquiry = value as Partial<ContactInquiry>;
-  return Boolean(inquiry.id && inquiry.type && inquiry.sender_email && inquiry.title && inquiry.message && inquiry.created_at);
-}
-
-async function readStorageContactInquiry(path: string): Promise<ContactInquiry | null> {
-  try {
-    const { data, error } = await serverClient().storage
-      .from(CONTACT_INQUIRY_STORAGE_BUCKET)
-      .download(path);
-
-    if (error || !data) return null;
-    const parsed = JSON.parse(await data.text());
-    if (!isContactInquiry(parsed)) return null;
-    return { ...parsed, storage_path: path };
-  } catch (e) {
-    console.error('[db] readStorageContactInquiry:', path, e);
-    return null;
-  }
-}
-
-async function listStorageContactInquiryPaths(prefix = CONTACT_INQUIRY_STORAGE_PREFIX, limit = 100): Promise<string[]> {
-  try {
-    await ensureContactInquiryBucket();
-    const { data, error } = await serverClient().storage
-      .from(CONTACT_INQUIRY_STORAGE_BUCKET)
-      .list(prefix, {
-        limit,
-        sortBy: { column: 'created_at', order: 'desc' },
-      });
-
-    if (error) {
-      console.error('[db] listStorageContactInquiryPaths:', error.message);
-      return [];
-    }
-
-    const paths: string[] = [];
-    for (const item of data ?? []) {
-      if (!item.name) continue;
-      if (item.id === null) {
-        paths.push(...(await listStorageContactInquiryPaths(`${prefix}/${item.name}`, limit)));
-      } else if (item.name.endsWith('.json')) {
-        paths.push(`${prefix}/${item.name}`);
-      }
-      if (paths.length >= limit) break;
-    }
-    return paths.slice(0, limit);
-  } catch (e) {
-    console.error('[db] listStorageContactInquiryPaths exception:', e);
-    return [];
-  }
-}
-
-async function getStorageContactInquiries(limit = 100): Promise<ContactInquiry[]> {
-  const paths = await listStorageContactInquiryPaths(CONTACT_INQUIRY_STORAGE_PREFIX, limit);
-  const inquiries = await Promise.all(paths.map((path) => readStorageContactInquiry(path)));
-  return inquiries
-    .filter((inquiry): inquiry is ContactInquiry => Boolean(inquiry))
-    .sort((a, b) => b.created_at.localeCompare(a.created_at))
-    .slice(0, limit);
-}
 
 export async function createContactInquiry(
   payload: ContactInquiryPayload,
@@ -692,19 +559,17 @@ export async function createContactInquiry(
       .single();
 
     if (error) {
-      console.error('[db] createContactInquiry table fallback:', error.message);
-      return createContactInquiryInStorage(payload, meta);
+      console.error('[db] createContactInquiry:', error.code ?? 'DATABASE_ERROR');
+      return { id: null, error: 'Database insert failed', code: error.code };
     }
     return { id: data?.id ?? null };
   } catch (e) {
-    console.error('[db] createContactInquiry exception fallback:', e);
-    return createContactInquiryInStorage(payload, meta);
+    console.error('[db] createContactInquiry exception:', e instanceof Error ? e.name : 'UnknownError');
+    return { id: null, error: 'Database insert failed', code: 'DATABASE_EXCEPTION' };
   }
 }
 
 export async function getContactInquiries(limit = 100): Promise<{ inquiries: ContactInquiry[]; error?: string; code?: string }> {
-  const storageInquiries = await getStorageContactInquiries(limit);
-
   try {
     const { data, error } = await serverClient()
       .from('contact_inquiries')
@@ -713,27 +578,14 @@ export async function getContactInquiries(limit = 100): Promise<{ inquiries: Con
       .limit(limit);
 
     if (error) {
-      if (!isMissingContactTable(error)) console.error('[db] getContactInquiries:', error.message);
-      if (storageInquiries.length) return { inquiries: storageInquiries };
-      return { inquiries: [], error: error.message, code: error.code };
+      console.error('[db] getContactInquiries:', error.code ?? 'DATABASE_ERROR');
+      return { inquiries: [], error: 'Database query failed', code: error.code };
     }
 
-    const tableInquiries = (data ?? []) as ContactInquiry[];
-    const byId = new Map<string, ContactInquiry>();
-    for (const inquiry of [...tableInquiries, ...storageInquiries]) {
-      byId.set(inquiry.id, inquiry);
-    }
-
-    return {
-      inquiries: [...byId.values()]
-        .sort((a, b) => b.created_at.localeCompare(a.created_at))
-        .slice(0, limit),
-    };
+    return { inquiries: (data ?? []) as ContactInquiry[] };
   } catch (e) {
-    const error = e instanceof Error ? e.message : 'Unknown error';
-    console.error('[db] getContactInquiries exception:', e);
-    if (storageInquiries.length) return { inquiries: storageInquiries };
-    return { inquiries: [], error };
+    console.error('[db] getContactInquiries exception:', e instanceof Error ? e.name : 'UnknownError');
+    return { inquiries: [], error: 'Database query failed', code: 'DATABASE_EXCEPTION' };
   }
 }
 

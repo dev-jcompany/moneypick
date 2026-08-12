@@ -33,7 +33,7 @@
 | 로컬 보안 환경 검사 | PASS | 관리자 비밀번호 정책은 운영 결정에 따라 최소 14자로 설정, 실제 값은 16자 확인 |
 | Vercel Production 환경변수 | PASS | `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_AUTH_SECRET` 교체 및 암호화 등록 확인 |
 | Supabase Production RLS | PASS | 존재하는 대상 테이블 9개 모두 RLS 활성화, anon/public 쓰기 정책 조회 0건 |
-| 문의 테이블 존재 여부 | NOT PRESENT | `to_regclass('public.contact_inquiries')` 결과 `NULL`; 문의 저장 기능 활성화 전 테이블 생성 필요 |
+| 문의 테이블 운영 상태 | PASS | Production 테이블 생성, RLS 활성화, 정책 0건, anon 전체 권한 차단, service_role SELECT/INSERT 허용 |
 | Production 배포 및 무인증 접근 | PASS | 배포 `dpl_6DzUHT1ZBttmC7B7JSuTpohwpjZY`; 관리자 307, 로그인 200, 내부 경로 404, 쓰기 API 401 |
 
 ## 관리자 인증 원칙
@@ -70,3 +70,18 @@
 애플리케이션 수준 rate limit은 서버리스 인스턴스별 메모리를 사용하므로 Vercel WAF 또는 공유 저장소 기반 분산 rate limit을 추가해야 한다. 로그아웃은 브라우저 쿠키를 즉시 만료하지만 이미 탈취된 stateless 토큰의 서버 강제 폐기는 지원하지 않으므로, 필요하면 공유 세션 저장소 기반으로 전환한다.
 
 남은 순서는 Vercel 분산 rate limit → Production 환경변수 교체·검증 → Supabase RLS 증빙 → 전체 Production 회귀검증이다.
+
+## Contact inquiry 운영 정상화
+
+- Migration: `supabase/migrations/20260812_create_contact_inquiries.sql`
+- Schema: `id`, `type`, `sender_email`, `sender_name`, `title`, `message`, `status`, `referer`, `user_agent`, `created_at`
+- 저장 경로: 브라우저 → `POST /api/contact` → 서버 검증 → service_role → `contact_inquiries`
+- Storage fallback: 제거. DB 저장 실패 시 API도 실패를 반환하여 이중 저장과 허위 성공을 방지
+- RLS: 활성화
+- anon 권한: SELECT/INSERT/UPDATE/DELETE 모두 차단(Production REST 요청 각각 401)
+- service_role 권한: SELECT/INSERT 허용, 브라우저 번들·로그·Git 노출 없음
+- E2E: 비개인 테스트 문의 1건 API 201 및 ID 반환, DB 저장 1건, 인증된 관리자 화면 표시 확인
+- 관리자 캐시: `private, no-cache, no-store, max-age=0, must-revalidate` 확인
+- Production deployment: `2bUnR7m9wVZSQMQPmovRCdBy5MA8`
+- 재배포 회귀: 비로그인 관리자 307, 로그인 200, 관리자 목록 200, 잘못된 문의 400
+- service_role: 클라이언트 빌드 값 노출 없음 확인

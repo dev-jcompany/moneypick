@@ -66,6 +66,7 @@ where (
       'newsletter_campaigns',
       'calculator_settings',
       'site_settings',
+      'contact_inquiries',
       'moneypick_categories',
       'moneypick_articles'
     ])
@@ -80,3 +81,10 @@ where (
     and (coalesce(qual, '') like '%article-images%'
       or coalesce(with_check, '') like '%article-images%')
   );
+
+-- 4) This query must return zero rows: no browser-role grants on inquiries.
+select grantee, privilege_type
+from information_schema.role_table_grants
+where table_schema = 'public'
+  and table_name = 'contact_inquiries'
+  and grantee in ('anon', 'authenticated', 'PUBLIC');
