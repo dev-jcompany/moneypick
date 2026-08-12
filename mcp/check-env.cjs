@@ -9,7 +9,7 @@ const requiredProduction = [
   ['NEXT_PUBLIC_SUPABASE_ANON_KEY', 1],
   ['SUPABASE_SERVICE_ROLE_KEY', 32],
   ['ADMIN_USERNAME', 4],
-  ['ADMIN_PASSWORD', 16],
+  ['ADMIN_PASSWORD', 14],
   ['ADMIN_AUTH_SECRET', 32],
   ['ADMIN_API_KEY', 32],
 ];

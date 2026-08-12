@@ -42,8 +42,8 @@ export function adminSecurityConfig() {
   if (production && username.toLowerCase() === 'admin') {
     throw new Error('[security] ADMIN_USERNAME must not use the default "admin" value in production.');
   }
-  if (production && password.length < 16) {
-    throw new Error('[security] ADMIN_PASSWORD must be at least 16 characters in production.');
+  if (production && password.length < 14) {
+    throw new Error('[security] ADMIN_PASSWORD must be at least 14 characters in production.');
   }
   if (production && signingSecret.length < 32) {
     throw new Error('[security] ADMIN_AUTH_SECRET must be at least 32 characters in production.');

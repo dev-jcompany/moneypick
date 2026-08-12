@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { adminPath } from '@/lib/admin-path';
+import { safeAdminReturnPath } from '@/lib/admin-path';
 
 export default function AdminLoginForm() {
   const [username, setUsername] = useState('');
@@ -11,7 +11,7 @@ export default function AdminLoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get('from') ?? adminPath();
+  const from = safeAdminReturnPath(searchParams.get('from'));
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();

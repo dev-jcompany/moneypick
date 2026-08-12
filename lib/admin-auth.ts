@@ -46,7 +46,10 @@ export function createAdminSessionToken() {
 }
 
 export function isAdminRequest(request: NextRequest) {
-  const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
+  return isAdminSessionToken(request.cookies.get(ADMIN_COOKIE_NAME)?.value);
+}
+
+export function isAdminSessionToken(token: string | undefined) {
   if (!token) return false;
 
   const [version, expires, signature] = token.split('.');

@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createContactInquiry, type ContactInquiryPayload } from '@/lib/db';
 import { isContactInquiryType } from '@/lib/contact-inquiries';
+import { ApiInputError, consumeRateLimit, isJsonObject, readLimitedJson } from '@/lib/api-security';
+
+const CONTACT_BODY_LIMIT_BYTES = 16 * 1024;
+const CONTACT_RATE_LIMIT = 5;
+const CONTACT_RATE_WINDOW_MS = 10 * 60 * 1000;
 
 function normalizeText(value: unknown, maxLength: number) {
   return String(value ?? '').trim().slice(0, maxLength);
@@ -11,8 +16,19 @@ function isValidEmail(value: string) {
 }
 
 export async function POST(req: NextRequest) {
+  const rateLimit = consumeRateLimit(req, 'contact', CONTACT_RATE_LIMIT, CONTACT_RATE_WINDOW_MS);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } },
+    );
+  }
+
   try {
-    const input = await req.json();
+    const input = await readLimitedJson(req, CONTACT_BODY_LIMIT_BYTES);
+    if (!isJsonObject(input)) {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    }
     if (normalizeText(input.website, 200)) {
       return NextResponse.json({ ok: true }, { status: 201 });
     }
@@ -63,6 +79,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ id: result.id }, { status: 201 });
   } catch (e) {
+    if (e instanceof ApiInputError) {
+      return NextResponse.json({ error: e.message }, { status: e.status });
+    }
     console.error('[api/contact POST]', e);
     return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
   }

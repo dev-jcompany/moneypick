@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "security:env": "node mcp/check-env.cjs",
+    "security:test": "vitest run tests/security",
     "mcp:draft": "node mcp/moneypick-draft-agent.mjs",
     "lint": "eslint"
   },
@@ -16,9 +17,10 @@
     "@supabase/supabase-js": "^2.108.2",
     "@tailwindcss/typography": "^0.5.19",
     "fuse.js": "^7.4.2",
-    "next": "16.2.7",
+    "next": "16.3.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "sanitize-html": "2.17.6",
     "sharp": "^0.35.2"
   },
   "devDependencies": {
@@ -26,9 +28,11 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sanitize-html": "2.16.1",
     "eslint": "^9",
-    "eslint-config-next": "16.2.7",
+    "eslint-config-next": "16.3.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "4.1.10"
   }
 }

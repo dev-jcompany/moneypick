@@ -1,6 +1,12 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { isAdminRequest } from '@/lib/admin-auth';
-import { adminPath, isInternalAdminPath, isPublicAdminPath, toInternalAdminPath } from '@/lib/admin-path';
+import {
+  ADMIN_INTERNAL_LOGIN_PATH,
+  adminPath,
+  isInternalAdminPath,
+  isPublicAdminPath,
+  toInternalAdminPath,
+} from '@/lib/admin-path';
 
 const PROTECTED_API_PREFIXES = ['/api/articles', '/api/categories'];
 const DEFAULT_PRIVATE_ENTRY_PATH = '/mp-preview-8r6q2';
@@ -72,7 +78,7 @@ export function proxy(request: NextRequest) {
   const accessGateResponse = preopenAccessGate(request);
   if (accessGateResponse) return accessGateResponse;
 
-  if (isInternalAdminPath(pathname)) {
+  if (isInternalAdminPath(pathname) || pathname === ADMIN_INTERNAL_LOGIN_PATH) {
     return new NextResponse(null, { status: 404 });
   }
 
@@ -91,7 +97,7 @@ export function proxy(request: NextRequest) {
 
   if (pathname === adminPath('/login')) {
     const rewriteUrl = request.nextUrl.clone();
-    rewriteUrl.pathname = toInternalAdminPath(pathname);
+    rewriteUrl.pathname = ADMIN_INTERNAL_LOGIN_PATH;
     return NextResponse.rewrite(rewriteUrl);
   }
 
