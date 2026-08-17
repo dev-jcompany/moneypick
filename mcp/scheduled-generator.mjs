@@ -90,6 +90,11 @@ const SKELETON = {
 // ── 유틸 ──
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+function isCreditBalanceError(error) {
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  return /credit balance is too low/i.test(message);
+}
+
 function loadJson(p) {
   return JSON.parse(fs.readFileSync(p, 'utf8'));
 }
@@ -561,6 +566,11 @@ async function main() {
         break;
       } catch (e) {
         lastErr = e;
+        if (isCreditBalanceError(e)) {
+          console.error('Anthropic API 크레딧이 부족해 생성을 중단합니다. 크레딧 충전 후 다시 실행하세요.');
+          process.exitCode = 1;
+          return;
+        }
         console.warn(`  재시도 ${attempt}/3 — ${e.message}`);
         await sleep(3000 * attempt);
       }
@@ -575,6 +585,9 @@ async function main() {
 
   console.log(`\n완료: 성공 ${results.success.length}개 / 실패 ${results.failed.length}개`);
   console.log(`관리자에서 검수 후 발행하세요: ${process.env.ADMIN_API_URL}/mp-hub-8r6q2/articles`);
+  if (results.failed.length > 0) {
+    process.exitCode = 1;
+  }
 }
 
 main().catch(e => { console.error(e); process.exit(1); });

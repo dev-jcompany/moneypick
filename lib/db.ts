@@ -312,7 +312,7 @@ export async function getMoneypickArticlesByCategory(
 
 export async function getAllMoneypickArticles(): Promise<MoneypickArticleRow[]> {
   try {
-    const { data, error } = await client()
+    const { data, error } = await serverClient()
       .from('moneypick_articles')
       .select('*')
       .order('created_at', { ascending: false });
@@ -397,16 +397,25 @@ function cannotPersistThumbnail(payload: Partial<ArticleSavePayload>, columns: O
 
 export async function createMoneypickArticle(payload: ArticleSavePayload): Promise<ArticleSaveResult> {
   try {
-    const supabase = client();
-    const { data, error } = await supabase
-      .from('moneypick_articles')
-      .insert(payload)
-      .select('id')
-      .single();
-    if (!error) return { id: data?.id ?? null };
+    const supabase = serverClient();
+    let insertPayload: Partial<ArticleSavePayload> = payload;
+    const ignoredColumns: OptionalArticleColumn[] = [];
 
-    if (isMissingOptionalArticleColumn(error)) {
-      const ignoredColumns = missingOptionalArticleColumns(error);
+    for (let attempt = 0; attempt <= OPTIONAL_ARTICLE_COLUMNS.length; attempt += 1) {
+      const { data, error } = await supabase
+        .from('moneypick_articles')
+        .insert(insertPayload)
+        .select('id')
+        .single();
+      if (!error) return { id: data?.id ?? null, ignoredColumns: ignoredColumns.length ? ignoredColumns : undefined };
+
+      const missingColumns = missingOptionalArticleColumns(error).filter((column) => !ignoredColumns.includes(column));
+      if (missingColumns.length === 0) {
+        console.error('[db] createMoneypickArticle:', error.message);
+        return { id: null, error: error.message, code: error.code };
+      }
+
+      ignoredColumns.push(...missingColumns);
       if (cannotPersistThumbnail(payload, ignoredColumns)) {
         return {
           id: null,
@@ -415,41 +424,10 @@ export async function createMoneypickArticle(payload: ArticleSavePayload): Promi
           ignoredColumns,
         };
       }
-
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('moneypick_articles')
-        .insert(withoutUnsupportedOptionalColumns(payload, error))
-        .select('id')
-        .single();
-      if (!fallbackError) return { id: fallbackData?.id ?? null, ignoredColumns };
-
-      if (isMissingOptionalArticleColumn(fallbackError)) {
-        const finalIgnoredColumns = [...new Set([...ignoredColumns, ...missingOptionalArticleColumns(fallbackError)])];
-        if (cannotPersistThumbnail(payload, finalIgnoredColumns)) {
-          return {
-            id: null,
-            code: 'MISSING_THUMBNAIL_COLUMN',
-            error: '대표 이미지를 저장하려면 moneypick_articles.thumbnail_url 컬럼이 필요합니다.',
-            ignoredColumns: finalIgnoredColumns,
-          };
-        }
-
-        const { data: finalData, error: finalError } = await supabase
-          .from('moneypick_articles')
-          .insert(withoutUnsupportedOptionalColumns(payload, finalIgnoredColumns))
-          .select('id')
-          .single();
-        if (!finalError) return { id: finalData?.id ?? null, ignoredColumns: finalIgnoredColumns };
-        console.error('[db] createMoneypickArticle:', finalError.message);
-        return { id: null, error: finalError.message, code: finalError.code };
-      }
-
-      console.error('[db] createMoneypickArticle:', fallbackError.message);
-      return { id: null, error: fallbackError.message, code: fallbackError.code };
+      insertPayload = withoutUnsupportedOptionalColumns(payload, ignoredColumns);
     }
 
-    console.error('[db] createMoneypickArticle:', error.message);
-    return { id: null, error: error.message, code: error.code };
+    return { id: null, error: '지원되지 않는 선택 컬럼을 제거한 뒤에도 저장하지 못했습니다.', ignoredColumns };
   } catch (e) {
     console.error('[db] createMoneypickArticle exception:', e);
     return { id: null, error: e instanceof Error ? e.message : 'Unknown error' };
@@ -458,15 +436,24 @@ export async function createMoneypickArticle(payload: ArticleSavePayload): Promi
 
 export async function updateMoneypickArticle(id: string, payload: Partial<ArticleSavePayload>): Promise<{ ok: boolean; error?: string; code?: string; ignoredColumns?: OptionalArticleColumn[] }> {
   try {
-    const supabase = client();
-    const { error } = await supabase
-      .from('moneypick_articles')
-      .update(payload)
-      .eq('id', id);
-    if (!error) return { ok: true };
+    const supabase = serverClient();
+    let updatePayload: Partial<ArticleSavePayload> = payload;
+    const ignoredColumns: OptionalArticleColumn[] = [];
 
-    if (isMissingOptionalArticleColumn(error)) {
-      const ignoredColumns = missingOptionalArticleColumns(error);
+    for (let attempt = 0; attempt <= OPTIONAL_ARTICLE_COLUMNS.length; attempt += 1) {
+      const { error } = await supabase
+        .from('moneypick_articles')
+        .update(updatePayload)
+        .eq('id', id);
+      if (!error) return { ok: true, ignoredColumns: ignoredColumns.length ? ignoredColumns : undefined };
+
+      const missingColumns = missingOptionalArticleColumns(error).filter((column) => !ignoredColumns.includes(column));
+      if (missingColumns.length === 0) {
+        console.error('[db] updateMoneypickArticle:', error.message);
+        return { ok: false, error: error.message, code: error.code };
+      }
+
+      ignoredColumns.push(...missingColumns);
       if (cannotPersistThumbnail(payload, ignoredColumns)) {
         return {
           ok: false,
@@ -475,40 +462,10 @@ export async function updateMoneypickArticle(id: string, payload: Partial<Articl
           ignoredColumns,
         };
       }
-
-      const fallbackPayload = withoutUnsupportedOptionalColumns(payload, error);
-      const { error: fallbackError } = await supabase
-        .from('moneypick_articles')
-        .update(fallbackPayload)
-        .eq('id', id);
-      if (!fallbackError) return { ok: true, ignoredColumns };
-
-      if (isMissingOptionalArticleColumn(fallbackError)) {
-        const finalIgnoredColumns = [...new Set([...ignoredColumns, ...missingOptionalArticleColumns(fallbackError)])];
-        if (cannotPersistThumbnail(payload, finalIgnoredColumns)) {
-          return {
-            ok: false,
-            code: 'MISSING_THUMBNAIL_COLUMN',
-            error: '대표 이미지를 저장하려면 moneypick_articles.thumbnail_url 컬럼이 필요합니다.',
-            ignoredColumns: finalIgnoredColumns,
-          };
-        }
-
-        const { error: finalError } = await supabase
-          .from('moneypick_articles')
-          .update(withoutUnsupportedOptionalColumns(payload, finalIgnoredColumns))
-          .eq('id', id);
-        if (!finalError) return { ok: true, ignoredColumns: finalIgnoredColumns };
-        console.error('[db] updateMoneypickArticle:', finalError.message);
-        return { ok: false, error: finalError.message, code: finalError.code };
-      }
-
-      console.error('[db] updateMoneypickArticle:', fallbackError.message);
-      return { ok: false, error: fallbackError.message, code: fallbackError.code };
+      updatePayload = withoutUnsupportedOptionalColumns(payload, ignoredColumns);
     }
 
-    console.error('[db] updateMoneypickArticle:', error.message);
-    return { ok: false, error: error.message, code: error.code };
+    return { ok: false, error: '지원되지 않는 선택 컬럼을 제거한 뒤에도 수정하지 못했습니다.', ignoredColumns };
   } catch (e) {
     console.error('[db] updateMoneypickArticle exception:', e);
     return { ok: false, error: e instanceof Error ? e.message : 'Unknown error' };
@@ -517,7 +474,7 @@ export async function updateMoneypickArticle(id: string, payload: Partial<Articl
 
 export async function deleteMoneypickArticle(id: string): Promise<boolean> {
   try {
-    const { error } = await client().from('moneypick_articles').delete().eq('id', id);
+    const { error } = await serverClient().from('moneypick_articles').delete().eq('id', id);
     if (error) { console.error('[db] deleteMoneypickArticle:', error.message); return false; }
     return true;
   } catch (e) {
