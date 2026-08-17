@@ -198,8 +198,8 @@ export default function ArticleEditorForm({ existing }: Props) {
       lead: existing?.lead?.trim() || metaDescription.trim(),
       meta_description: metaDescription.trim() || null,
       body_html: bodyHtml.trim(),
-      summary: [],
-      faq: [],
+      summary: existing?.summary ?? [],
+      faq: existing?.faq ?? [],
       tags: tags
         .split(',')
         .map((tag) => tag.trim())
@@ -212,6 +212,10 @@ export default function ArticleEditorForm({ existing }: Props) {
       disclaimer: disclaimer.trim() || null,
       thumbnail_url: trimmedThumbnailUrl || null,
       status,
+      source: existing?.source ?? 'admin',
+      article_type: existing?.article_type ?? null,
+      pattern_id: existing?.pattern_id ?? null,
+      recommended_slugs: existing?.recommended_slugs ?? null,
     };
 
     const url = isEdit ? `/api/articles/${existing.id}` : '/api/articles';

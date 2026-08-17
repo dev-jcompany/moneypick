@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateMoneypickArticle, deleteMoneypickArticle } from '@/lib/db';
+import { deleteMoneypickArticle } from '@/lib/db';
+import { updateArticleThroughPipeline } from '@/lib/articles/persistence';
 import { isAdminRequest, unauthorized } from '@/lib/admin-auth';
 
 interface Context { params: Promise<{ id: string }> }
@@ -10,7 +11,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
   try {
     const { id } = await params;
     const payload = await req.json();
-    const result = await updateMoneypickArticle(id, payload);
+    const result = await updateArticleThroughPipeline(id, payload);
 
     if (!result.ok) {
       const isDuplicate = result.code === '23505';

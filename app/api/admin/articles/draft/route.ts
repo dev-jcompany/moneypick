@@ -2,7 +2,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import { adminPath } from '@/lib/admin-path';
 import { createArticleThumbnail } from '@/lib/article-thumbnail';
-import { createMoneypickArticle } from '@/lib/db';
+import { createArticleThroughPipeline } from '@/lib/articles/persistence';
 import type { ArticleSavePayload } from '@/lib/db';
 
 export const runtime = 'nodejs';
@@ -26,6 +26,9 @@ type DraftRequestBody = {
   articleType?: unknown;
   patternId?: unknown;
   relatedSlugs?: unknown;
+  summaryItems?: unknown;
+  faq?: unknown;
+  relatedCalculators?: unknown;
 };
 
 const CATEGORY_MAP: Record<string, { key: string; label: string }> = {
@@ -110,6 +113,41 @@ function normalizeTags(value: unknown) {
     .slice(0, 12);
 }
 
+function normalizeSummaryItems(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((item): item is string => typeof item === 'string')
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 5);
+}
+
+function normalizeFaq(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((item): item is { q: string; a: string } =>
+      Boolean(item && typeof item === 'object' && typeof (item as { q?: unknown }).q === 'string' && typeof (item as { a?: unknown }).a === 'string'))
+    .map((item) => ({ q: item.q.trim(), a: item.a.trim() }))
+    .filter((item) => item.q && item.a)
+    .slice(0, 5);
+}
+
+function normalizeRelatedCalculators(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (typeof item === 'string') {
+        const slug = item.replace(/^.*\//, '').trim();
+        return slug ? { label: '관련 계산기', href: `/calculators/${slug}` } : null;
+      }
+      if (!item || typeof item !== 'object') return null;
+      const label = optionalString((item as { label?: unknown }).label);
+      const href = optionalString((item as { href?: unknown }).href);
+      return label && href ? { label, href } : null;
+    })
+    .filter((item): item is { label: string; href: string } => Boolean(item));
+}
+
 export async function POST(req: NextRequest) {
   const configuredApiKey = process.env.ADMIN_API_KEY?.trim();
   if (!configuredApiKey) {
@@ -186,14 +224,14 @@ export async function POST(req: NextRequest) {
       lead,
       meta_description: metaDescription,
       body_html: contentHtml.value,
-      summary: [],
-      faq: [],
+      summary: normalizeSummaryItems(body.summaryItems),
+      faq: normalizeFaq(body.faq),
       tags,
       editor: source === 'claude_desktop' ? 'Claude Desktop' : '머니픽 에디터',
       reading_time: readingTime,
       hero_value: heroValue,
       hero_label: heroLabel,
-      related_calculators: [],
+      related_calculators: normalizeRelatedCalculators(body.relatedCalculators),
       disclaimer: null,
       thumbnail_url: thumbnailUrl,
       status: 'draft',
@@ -205,7 +243,7 @@ export async function POST(req: NextRequest) {
         : null,
     };
 
-    const result = await createMoneypickArticle(payload);
+    const result = await createArticleThroughPipeline(payload);
     if (!result.id) {
       const isDuplicate = result.code === '23505';
       return NextResponse.json(

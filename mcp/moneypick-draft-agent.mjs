@@ -104,6 +104,17 @@ async function handleMessage(rawMessage) {
                   slug: { type: 'string', description: 'URL slug' },
                   category: { type: 'string', description: 'Category label or key' },
                   summary: { type: 'string', description: 'Summary or lead text' },
+                  summaryItems: { type: 'array', items: { type: 'string' }, description: 'Optional structured summary points; manual values are preserved' },
+                  faq: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      additionalProperties: false,
+                      required: ['q', 'a'],
+                      properties: { q: { type: 'string' }, a: { type: 'string' } },
+                    },
+                    description: 'Optional structured FAQ entries',
+                  },
                   contentHtml: { type: 'string', description: 'Article body HTML' },
                   tags: { type: 'array', items: { type: 'string' }, description: 'Tag list' },
                   heroStat: { type: 'string', description: 'Combined hero metric in "value / label" format' },
@@ -112,6 +123,13 @@ async function handleMessage(rawMessage) {
                   readingTime: { type: 'string', description: 'Reading time label' },
                   thumbnailUrl: { type: 'string', description: 'Thumbnail image URL' },
                   metaDescription: { type: 'string', description: 'Meta description' },
+                  articleType: { type: 'string', description: 'Optional existing MoneyPick article type override' },
+                  patternId: { type: 'string', description: 'Optional existing MoneyPick pattern id override' },
+                  relatedCalculators: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Optional calculator slugs; the shared core fills this when omitted',
+                  },
                 },
               },
             },
@@ -168,6 +186,8 @@ async function saveDraft(args) {
       slug: args.slug.trim(),
       category: args.category.trim(),
       summary: args.summary.trim(),
+      summaryItems: Array.isArray(args.summaryItems) ? args.summaryItems : [],
+      faq: Array.isArray(args.faq) ? args.faq : [],
       contentHtml: args.contentHtml.trim(),
       tags: Array.isArray(args.tags) ? args.tags : [],
       heroStat: optionalString(args.heroStat),
@@ -176,6 +196,9 @@ async function saveDraft(args) {
       readingTime: optionalString(args.readingTime),
       thumbnailUrl: optionalString(args.thumbnailUrl),
       metaDescription: optionalString(args.metaDescription),
+      articleType: optionalString(args.articleType),
+      patternId: optionalString(args.patternId),
+      relatedCalculators: Array.isArray(args.relatedCalculators) ? args.relatedCalculators : [],
       status: 'draft',
       source: 'claude_desktop',
     }),
@@ -210,6 +233,18 @@ function validateDraft(args) {
 
   if (args.tags != null && (!Array.isArray(args.tags) || args.tags.some((tag) => typeof tag !== 'string'))) {
     return 'tags must be an array of strings.';
+  }
+
+  if (args.summaryItems != null && (!Array.isArray(args.summaryItems) || args.summaryItems.some((item) => typeof item !== 'string'))) {
+    return 'summaryItems must be an array of strings.';
+  }
+
+  if (args.faq != null && (!Array.isArray(args.faq) || args.faq.some((item) => !item || typeof item.q !== 'string' || typeof item.a !== 'string'))) {
+    return 'faq must be an array of q/a objects.';
+  }
+
+  if (args.relatedCalculators != null && (!Array.isArray(args.relatedCalculators) || args.relatedCalculators.some((item) => typeof item !== 'string'))) {
+    return 'relatedCalculators must be an array of calculator slugs.';
   }
 
   return null;

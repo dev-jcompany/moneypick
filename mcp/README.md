@@ -26,6 +26,6 @@ ADMIN_API_KEY=배포환경과_같은_관리자_API_KEY
 
 ## 제공 도구
 
-- `saveDraft`: title, seoTitle, slug, category, summary, contentHtml, tags를 받아 관리자 API에 임시저장 글을 생성합니다.
+- `saveDraft`: title, seoTitle, slug, category, summary, contentHtml, tags를 받아 관리자 API에 임시저장 글을 생성합니다. 선택적으로 `summaryItems`, `faq`, `articleType`, `patternId`, `relatedCalculators`를 전달할 수 있으며, 누락값은 Article Generation Core가 보완합니다.
 
 발행은 자동으로 하지 않습니다. 관리자 화면에서 검수 후 수동 발행합니다.

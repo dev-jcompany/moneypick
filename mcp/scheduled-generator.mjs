@@ -26,6 +26,7 @@ import {
   SCENARIO_SUPPORTED_CALCULATORS,
 } from '../lib/calculators/engine.mjs';
 import { matchSources } from './official-registry.mjs';
+import { normalizeArticle } from '../lib/articles/generation-core.mjs';
 import {
   loadLinkCache,
   saveLinkCache,
@@ -369,6 +370,21 @@ async function postDraft(obj, thumbnailUrl) {
   }
 
   const endpoint = adminApiUrl.replace(/\/+$/, '') + '/api/admin/articles/draft';
+  const normalized = normalizeArticle({
+    title: obj.title,
+    slug: obj.slug,
+    category: obj.category,
+    category_label: obj.category,
+    lead: obj.metaDescription ?? obj.heroStat ?? '',
+    meta_description: obj.metaDescription ?? obj.heroStat ?? '',
+    body_html: obj.bodyHtml,
+    summary: obj.summaryItems ?? [],
+    faq: obj.faq ?? [],
+    tags: obj.tags ?? [],
+    related_calculators: obj.relatedCalculators ?? [],
+    article_type: obj.articleType ?? null,
+    pattern_id: obj.patternId ?? null,
+  });
 
   const resp = await fetch(endpoint, {
     method: 'POST',
@@ -386,8 +402,11 @@ async function postDraft(obj, thumbnailUrl) {
       heroValue:       obj.heroStat?.split(' / ')[0]?.trim() ?? '',
       heroLabel:       obj.heroStat?.split(' / ')[1]?.trim() ?? '',
       readingTime:     obj.readingTime ?? '5분',
-      contentHtml:     obj.bodyHtml,
+      contentHtml:     normalized.article.body_html,
+      summaryItems:    normalized.article.summary,
+      faq:             normalized.article.faq,
       tags:            obj.tags ?? [],
+      relatedCalculators: normalized.article.related_calculators,
       thumbnailUrl:    thumbnailUrl ?? null,
       articleType:     obj.articleType ?? null,
       patternId:       obj.patternId ?? null,

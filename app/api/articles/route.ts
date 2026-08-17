@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createMoneypickArticle } from '@/lib/db';
+import { createArticleThroughPipeline } from '@/lib/articles/persistence';
 import { isAdminRequest, unauthorized } from '@/lib/admin-auth';
 import type { ArticleSavePayload } from '@/lib/db';
 
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '필수 항목이 누락되었습니다.' }, { status: 400 });
     }
 
-    const result = await createMoneypickArticle(payload);
+    const result = await createArticleThroughPipeline(payload);
     if (!result.id) {
       const isDuplicate = result.code === '23505';
       const needsThumbnailColumn = result.code === 'MISSING_THUMBNAIL_COLUMN';
