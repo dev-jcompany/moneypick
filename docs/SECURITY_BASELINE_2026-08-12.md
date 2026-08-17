@@ -60,10 +60,90 @@
 - [x] Vercel Production의 `ADMIN_AUTH_SECRET` 교체 및 정책 확인(32자 이상, 비밀번호와 다른 값)
 - [x] Production과 동일한 관리자 설정을 대상으로 `npm run security:env` PASS
 - [x] Supabase SQL Editor에서 `supabase/security-verification.sql` 실행 및 결과 보관
-- [ ] 관리자 로그인·문의·기사 CRUD 회귀 테스트
+- [x] 관리자 로그인·문의·기사 CRUD 회귀 테스트
 - [x] Production 배포
 - [x] 비로그인 관리자 페이지 접근 307 확인
 - [x] 비로그인 관리자 쓰기 API 접근 401 확인
+
+## 2026-08-17 추가 하드닝 및 회귀검증
+
+기준 커밋: `b4607a2` (이전 `a7185cb`)
+
+### 적용 사항
+
+- `moneypick_articles` 관리자 쓰기 경로(`createMoneypickArticle`/`updateMoneypickArticle`/`deleteMoneypickArticle`/`getAllMoneypickArticles`)를 anon client에서 server-only service-role client(`serverClient()`)로 전환. `security-hardening.sql`의 anon SELECT-published-only RLS 정책과 정합.
+- 컬럼 fallback 로직을 중첩 재시도에서 유한 루프(`OPTIONAL_ARTICLE_COLUMNS.length` 상한)로 정리. 스키마 오류(`42703`/`PGRST204` + 알려진 컬럼명 매칭)만 fallback 대상으로 하고 그 외 오류(RLS/인증/중복 등)는 즉시 실제 오류로 반환.
+- `mcp/scheduled-generator.mjs`에 Anthropic API 크레딧 부족 감지(`isCreditBalanceError`) 추가. 감지 시 `main()`을 즉시 종료(`return`)하여 이후 주제 생성을 중단하고 `process.exitCode = 1` 설정. 일부 기사 생성 실패가 있어도 `process.exitCode = 1`을 설정해 자동화 결과가 성공으로 위장되지 않도록 함.
+
+### 코드 검증 결과
+
+| 항목 | 결과 |
+| --- | --- |
+| service role은 server-only (`'use client'` 없음) | PASS |
+| Client Component의 service role 런타임 import 없음(타입만 import) | PASS |
+| Browser bundle에 service role 노출 없음, `NEXT_PUBLIC_*` 미사용 | PASS |
+| 관리자 API는 service role 실행 전 인증(`isAdminRequest`/API 키) | PASS |
+| 공개 API에 service role 쓰기 경로 노출 없음 | PASS |
+| 컬럼 fallback: 정상 스키마 1회 성공 | PASS |
+| 컬럼 fallback: 무한 반복 없음(유한 루프) | PASS |
+| 컬럼 fallback: RLS/인증 오류를 스키마 오류로 오인하지 않음 | PASS |
+| credit 부족 감지 정확도(9개 케이스: 실제 메시지 매치, 일시적 오류 비매치) | PASS (9/9) |
+| credit 부족 시 즉시 중단 및 exit code 1 | PASS |
+
+### 정적 검증
+
+| 항목 | 결과 |
+| --- | --- |
+| `npx tsc --noEmit` | PASS (오류 0건) |
+| `npm run lint` | PASS (오류 0건, 기존 경고 26건 외 신규 없음) |
+| `npm run build` | PASS |
+| `npm run security:env` | PASS |
+
+### Git / 배포
+
+| 항목 | 결과 |
+| --- | --- |
+| 커밋 | `b4607a2` "fix: harden admin writes and generator failure handling" |
+| `origin/master` push | PASS, local/remote hash 일치 |
+| Production 배포(Vercel) | READY, `https://www.moneypick.co.kr` 200 확인 |
+
+### 관리자 로그인 회귀 (Production)
+
+| 항목 | 결과 |
+| --- | --- |
+| 비로그인 `/mp-hub-8r6q2` 접근 | 307 → 로그인 페이지 |
+| 비로그인 쓰기 API(`POST /api/articles`) | 401 |
+| 잘못된 로그인 | 401 |
+| 정상 로그인 | 200, `admin_auth` 세션 쿠키 발급 |
+| 로그인 세션으로 관리자 페이지 접근 | 200 |
+| 관리자 문의 목록 캐시 헤더 | `private, no-cache, no-store, max-age=0, must-revalidate` 확인 |
+| 로그아웃 | 200, 쿠키 제거 확인 |
+
+### 문의(Contact) E2E (Production)
+
+| 항목 | 결과 |
+| --- | --- |
+| 비개인 테스트 문의 1건 `POST /api/contact` | 201, ID 반환 |
+| 관리자 문의 화면에서 동일 문의 확인(ID/이메일 매칭) | PASS |
+| 비로그인 관리자 문의 접근 | 307 차단 |
+| 잘못된 문의 요청 | 400 |
+
+### Article CRUD E2E (Production)
+
+| 테스트 | 결과 |
+| --- | --- |
+| CREATE (draft) | PASS — `serverClient()` 경유 저장 성공, RLS 오류 없음 |
+| READ (관리자 목록 노출) | PASS |
+| READ (공개 draft 비노출) | PASS — `/articles/{slug}` 404 (RLS로 anon에 미노출, 앱 레벨 status 필터 없이도 차단 확인) |
+| UPDATE (제목 수정) | PASS — 중복 레코드 없음 확인 |
+| PUBLISH | PASS — published 전환 후 공개 URL 307→200 정상 노출 |
+| DELETE | PASS — 관리자 목록 및 공개 경로 모두 404, 잔여 데이터 없음 |
+
+테스트 아티클(`[TEST] MoneyPick Admin CRUD Verification`)은 검증 완료 후 즉시 삭제하여 Production에 잔존하지 않음. 문의 테스트 레코드(`qa-test-noreply@example.com`)는 비개인 데이터이며 삭제 API가 없어 기존 2026-08-12 검증 시와 동일하게 보존됨.
+
+### 잔여 사항
+
+애플리케이션 rate limit은 서버리스 인스턴스별 메모리 기반으로, 완전한 분산 rate limit이 아니다. `SECURITY-P1`로 후속 등록: Vercel WAF/Firewall 또는 Upstash Redis 등 공유 저장소 기반 분산 rate limit 검토. 이번 Sprint 종료를 막는 P0로 취급하지 않는다.
 
 ## 다음 24시간 권고 순서
 
