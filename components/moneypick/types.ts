@@ -1,3 +1,5 @@
+import type { ArticleSchemaV2 } from '@/lib/article-system/article-schema.mjs';
+
 export type CategoryKey = string;
 
 export type ArticleBlock =
@@ -59,6 +61,7 @@ export interface MoneypickArticleRow {
   article_type?: string | null;
   pattern_id?: string | null;
   recommended_slugs?: string[] | null;
+  article_schema?: ArticleSchemaV2 | null;
   views: number;
   created_at: string;
   updated_at: string;

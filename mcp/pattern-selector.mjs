@@ -1,4 +1,5 @@
 // 머니픽 기사 유형 · 구성 패턴 선택기
+import { mapLegacyArchetype, mapLegacyArticleType } from '../lib/article-system/content-types.mjs';
 // 주제 → (1) 6개 기사 유형 중 하나 선택 → (2) 해당 유형의 2개 패턴 중 최근 중복을 피해 하나 선택
 //
 // 유형 분류 우선순위:
@@ -79,6 +80,7 @@ export function selectArticleType(topic) {
   if (isConcreteCaseStudyTitle(titleText)) {
     return {
       articleType: 'CASE_STUDY',
+      contentType: mapLegacyArticleType('CASE_STUDY'),
       reason: `구체적 상황형 제목 감지("사례"/"케이스" 또는 연봉·소득·나이·대출금 + 숫자) → CASE_STUDY 최우선`,
       level: 'case-priority',
     };
@@ -89,17 +91,32 @@ export function selectArticleType(topic) {
   if (overrideMatch) {
     return {
       articleType: overrideMatch.type,
+      contentType: mapLegacyArticleType(overrideMatch.type),
       reason: `제목의 강한 의도 키워드로 archetype override: [${overrideMatch.matchedKeywords.join(', ')}]`,
       level: 'title-override',
     };
   }
 
-  // 2) 기존 archetype 명칭 (기본 우선순위)
+  // 2) Canonical registry로 기존 8개 archetype을 명시적으로 해석한다.
+  // HOW_TO/TIPS_LIST는 legacy DB article_type에 없으므로 GUIDE를 유지하고 contentType만 canonical 값을 제공한다.
+  const canonicalArchetype = mapLegacyArchetype(topic.archetype);
+  if (canonicalArchetype) {
+    const legacyArticleType = ['HOW_TO', 'TIPS_LIST'].includes(canonicalArchetype) ? 'GUIDE' : canonicalArchetype;
+    return {
+      articleType: legacyArticleType,
+      contentType: canonicalArchetype,
+      reason: `canonical archetype registry match: "${topic.archetype}"`,
+      level: 'archetype-registry',
+    };
+  }
+
+  // 3) Registry에 없는 과거 변형 명칭은 기존 keyword 규칙으로 보조한다.
   const archetypeText = topic.archetype ?? '';
   const archetypeMatch = matchByKeywords(archetypeText);
   if (archetypeMatch) {
     return {
       articleType: archetypeMatch.type,
+      contentType: mapLegacyArticleType(archetypeMatch.type),
       reason: `기존 archetype 명칭 매칭: "${topic.archetype}" → [${archetypeMatch.matchedKeywords.join(', ')}]`,
       level: 'archetype',
     };
@@ -110,6 +127,7 @@ export function selectArticleType(topic) {
   if (titleMatch) {
     return {
       articleType: titleMatch.type,
+      contentType: mapLegacyArticleType(titleMatch.type),
       reason: `제목/태그 키워드 매칭: [${titleMatch.matchedKeywords.join(', ')}]`,
       level: 'title',
     };
@@ -121,6 +139,7 @@ export function selectArticleType(topic) {
   if (intentMatch) {
     return {
       articleType: intentMatch.type,
+      contentType: mapLegacyArticleType(intentMatch.type),
       reason: `searchIntent/category 키워드 매칭: [${intentMatch.matchedKeywords.join(', ')}]`,
       level: 'searchIntent',
     };
@@ -128,6 +147,7 @@ export function selectArticleType(topic) {
 
   return {
     articleType: 'GUIDE',
+    contentType: mapLegacyArticleType('GUIDE'),
     reason: '0~4단계 키워드 매칭 실패 → GUIDE 기본값',
     level: 'fallback',
   };

@@ -77,6 +77,10 @@ alter table moneypick_articles
 alter table moneypick_articles
   add column if not exists pattern_id text;
 
+-- Article System V2 structured envelope. Nullable keeps every legacy row on the HTML renderer.
+alter table moneypick_articles
+  add column if not exists article_schema jsonb null;
+
 -- 추천 글 slug 목록 (자동 생성 시 내부링크 캐시 기반으로 채워짐, 향후 페이지 렌더링 활용)
 alter table moneypick_articles
   add column if not exists recommended_slugs text[] default '{}';

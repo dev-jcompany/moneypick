@@ -32,4 +32,24 @@ describe('MoneyPickArticle legacy compatibility', () => {
     expect(html).toContain('구조화 답변');
     expect(html).toContain('기존 HTML 본문');
   });
+
+  it('renders no more than three valid calculator CTAs', () => {
+    const html = renderToStaticMarkup(
+      <MoneyPickArticle
+        {...baseProps}
+        relatedCalculators={[
+          { label: 'DSR', href: '/calculators/dsr' },
+          { label: 'Mortgage', href: '/calculators/mortgage' },
+          { label: 'Jeonse', href: '/calculators/jeonse-loan' },
+          { label: 'Tax', href: '/calculators/acquisition-tax' },
+          { label: 'Invalid', href: '/calculators/not-real' },
+        ]}
+      />,
+    );
+    expect(html).toContain('/calculators/dsr');
+    expect(html).toContain('/calculators/mortgage');
+    expect(html).toContain('/calculators/jeonse-loan');
+    expect(html).not.toContain('/calculators/acquisition-tax');
+    expect(html).not.toContain('/calculators/not-real');
+  });
 });

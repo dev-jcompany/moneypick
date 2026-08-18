@@ -348,6 +348,7 @@ export type ArticleSavePayload = {
   article_type?: string | null;
   pattern_id?: string | null;
   recommended_slugs?: string[] | null;
+  article_schema?: import('@/lib/article-system/article-schema.mjs').ArticleSchemaV2 | null;
 };
 
 export type ArticleSaveResult = {
@@ -357,7 +358,7 @@ export type ArticleSaveResult = {
   ignoredColumns?: OptionalArticleColumn[];
 };
 
-const OPTIONAL_ARTICLE_COLUMNS = ['thumbnail_url', 'meta_description', 'source', 'seo_title', 'article_type', 'pattern_id', 'recommended_slugs'] as const;
+const OPTIONAL_ARTICLE_COLUMNS = ['thumbnail_url', 'meta_description', 'source', 'seo_title', 'article_type', 'pattern_id', 'recommended_slugs', 'article_schema'] as const;
 type OptionalArticleColumn = (typeof OPTIONAL_ARTICLE_COLUMNS)[number];
 
 function missingOptionalArticleColumns(error: { code?: string; message?: string } | null): OptionalArticleColumn[] {

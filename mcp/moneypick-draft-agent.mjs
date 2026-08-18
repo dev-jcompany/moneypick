@@ -38,26 +38,13 @@ function loadEnv(filePath) {
 
 function readMessages() {
   while (true) {
-    const headerEnd = buffer.indexOf('\r\n\r\n');
-    if (headerEnd === -1) return;
+    const newlineIndex = buffer.indexOf('\n');
+    if (newlineIndex === -1) return;
 
-    const header = buffer.slice(0, headerEnd).toString('utf8');
-    const contentLengthMatch = header.match(/Content-Length:\s*(\d+)/i);
-    if (!contentLengthMatch) {
-      buffer = Buffer.alloc(0);
-      console.error('[moneypick-draft-agent] Missing Content-Length header.');
-      return;
-    }
+    const rawMessage = buffer.slice(0, newlineIndex).toString('utf8').replace(/\r$/, '');
+    buffer = buffer.slice(newlineIndex + 1);
 
-    const contentLength = Number(contentLengthMatch[1]);
-    const messageStart = headerEnd + 4;
-    const messageEnd = messageStart + contentLength;
-    if (buffer.length < messageEnd) return;
-
-    const rawMessage = buffer.slice(messageStart, messageEnd).toString('utf8');
-    buffer = buffer.slice(messageEnd);
-
-    void handleMessage(rawMessage);
+    if (rawMessage.trim()) void handleMessage(rawMessage);
   }
 }
 
@@ -269,6 +256,5 @@ function sendError(id, code, message) {
 }
 
 function send(message) {
-  const json = JSON.stringify(message);
-  process.stdout.write(`Content-Length: ${Buffer.byteLength(json, 'utf8')}\r\n\r\n${json}`);
+  process.stdout.write(`${JSON.stringify(message)}\n`);
 }

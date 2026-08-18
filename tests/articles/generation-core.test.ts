@@ -25,6 +25,9 @@ const base = {
 };
 
 describe('Article Generation Core', () => {
+  it('extracts the canonical legacy ul.mp-summary format', () => {
+    expect(extractSummary('<ul class="mp-summary"><li>첫 번째</li><li>두 번째</li></ul>')).toEqual(['첫 번째', '두 번째']);
+  });
   it('extracts structured summary and FAQ from legacy HTML', () => {
     expect(extractSummary(base.body_html)).toEqual([
       '소득과 원리금 상환액을 함께 봅니다.',

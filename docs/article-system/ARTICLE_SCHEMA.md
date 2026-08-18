@@ -1,9 +1,12 @@
 # Article Schema 초안 · Legacy 호환 전략 · Article Agent V2 역할
 
+> 상태 (2026-08-18): Phase 1 기반 구현 완료. `ArticleSchemaV2` envelope, 최소 runtime validator,
+> legacy fallback 규칙과 nullable Production `article_schema` 컬럼이 적용되었다. V2 Renderer는 다음 Phase 범위다.
+
 [← ARTICLE_SYSTEM_V2.md](./ARTICLE_SYSTEM_V2.md)
 
-원 작업지시서 §21~22, §24에 대한 설계. **이 문서는 DB 마이그레이션을 실행하지 않는다.**
-스키마 초안과 저장 위치 결정만 다룬다.
+원 작업지시서 §21~22, §24에 대한 설계와 Phase 1 구현 상태를 기록한다.
+Production migration은 `supabase/migrations/20260818_add_article_schema.sql`로 적용되었다.
 
 ## 1. 저장 위치 결정
 
@@ -33,8 +36,8 @@ type ContentType =
 interface ArticleSchemaV2 {
   version: 2;
   contentType: ContentType;
-  patternId: string;       // 예: 'COMPARISON_01' — 기존 article-patterns.json 키 그대로 재사용
-  patternVariant?: string; // 예: 'COMPARISON_01-A' — 없으면 해당 패턴의 기본(A) Variant
+  pattern: string;         // 예: 'COMPARISON_01' — 기존 article-patterns.json 키 그대로 재사용
+  variant: string;         // 예: 'A'
   blocks: ArticleBlockV2[];
 }
 
@@ -72,7 +75,7 @@ JSON 구조 체크로 대체한다:
 
 ```
 - contentType이 8종 중 하나인가
-- patternId가 article-patterns.json(§CONTENT_TYPES_AND_PATTERNS.md 확장판)에 존재하는가
+- pattern이 해당 contentType의 allowed pattern 후보에 존재하는가
 - blocks[0]이 summary 타입인가(현재 "최상단 mp-summary" 규칙 계승)
 - blocks에 faq 타입이 최소 1개 있는가(현재 "최하단 mp-faq" 규칙 계승)
 - calculator Block이 있다면 items.length >= 3
@@ -150,5 +153,5 @@ engine/official registry/link cache/thumbnail generator/재시도·크레딧 부
 
 경로 1(관리자 수동)·경로 3(Claude Desktop MCP)은 Agent가 아니라 "사람이 직접/도구로 저장"하는
 경로이므로 Article Agent V2 범위 밖이다. 다만 Phase 4에서 관리자 폼에 Content Type/Pattern
-선택 UI가 추가되면, 이 두 경로도 최소한 `article_schema.contentType`/`patternId`는 채울 수
+선택 UI가 추가되면, 이 두 경로도 최소한 `article_schema.contentType`/`pattern`은 채울 수
 있게 된다(AI 자동 추천 + Override, 원 작업지시서 §23 방향과 일치).

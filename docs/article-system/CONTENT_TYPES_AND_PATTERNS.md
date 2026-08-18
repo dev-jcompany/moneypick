@@ -1,5 +1,8 @@
 # Content Type · Article Pattern · Pattern Variant 설계
 
+> 상태 (2026-08-18): Phase 1 기반 구현 완료. 8개 canonical type과 legacy archetype/articleType
+> mapping registry는 `lib/article-system/content-types.mjs`에 구현되었다. Pattern/Variant 확장은 후속 Phase다.
+
 [← ARTICLE_SYSTEM_V2.md](./ARTICLE_SYSTEM_V2.md)
 
 이 문서는 원 작업지시서 §13~15(Content Type, Article Pattern, Pattern Variant)에 대한 설계다.

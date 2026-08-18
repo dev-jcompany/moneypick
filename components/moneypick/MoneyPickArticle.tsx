@@ -1,6 +1,7 @@
 import React from 'react';
 import type { MoneyPickArticleProps, ArticleBlock, CategoryKey } from './types';
 import { sanitizePostHtml } from '@/lib/sanitize';
+import { normalizeRelatedCalculators } from '@/lib/article-calculators';
 
 const CATEGORY_THEME: Record<
   CategoryKey,
@@ -137,6 +138,7 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
     .filter((b): b is Extract<ArticleBlock, { type: 'faq' }> => b.type === 'faq')
     .flatMap((b) => b.items);
   const visibleSummary = getVisibleSummary(summary, lead);
+  const visibleCalculators = normalizeRelatedCalculators(relatedCalculators, categoryKey);
 
   return (
     <article
@@ -212,12 +214,12 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
         )}
 
         {/* ── 관련 계산기 CTA ── */}
-        {relatedCalculators && relatedCalculators.length > 0 && (
+        {visibleCalculators.length > 0 && (
           <section className="mt-10 rounded-2xl border border-[#c8e8d4] bg-[#f0faf5] p-6 dark:border-green-900/30 dark:bg-green-900/15">
             <p className="mb-4 text-[17px] font-extrabold text-[#1a1d1b] dark:text-white">이 글과 관련된 계산기</p>
             <div className="flex flex-wrap gap-3">
-              {relatedCalculators.slice(0, 1).map((calc, i) => (
-                <a key={i} href={calc.href}
+              {visibleCalculators.map((calc) => (
+                <a key={calc.href} href={calc.href}
                    className="inline-flex items-center gap-2 rounded-xl border border-[#1f9d57] bg-white px-4 py-2.5 text-[15px] font-semibold text-[#1f9d57] transition hover:bg-[#1f9d57] hover:text-white dark:bg-navy-800 dark:hover:bg-[#1f9d57]">
                   🧮 {calc.label}
                 </a>

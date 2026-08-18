@@ -38,7 +38,16 @@ export function normalizeRelatedCalculators(
   relatedCalculators: RelatedCalculator[] | null | undefined,
   categoryKey: CategoryKey | string,
 ): RelatedCalculator[] {
-  return relatedCalculators && relatedCalculators.length > 0
-    ? relatedCalculators
-    : getDefaultRelatedCalculators(categoryKey);
+  void categoryKey; // Kept for API compatibility; empty input intentionally produces no CTA.
+  if (!relatedCalculators?.length) return [];
+  const knownByHref = new Map(ARTICLE_CALCULATOR_OPTIONS.map((calculator) => [calculator.href, calculator]));
+  const result: RelatedCalculator[] = [];
+  for (const calculator of relatedCalculators) {
+    const known = knownByHref.get(calculator.href);
+    if (known && !result.some((item) => item.href === known.href)) {
+      result.push({ label: calculator.label.trim() || known.label, href: known.href });
+    }
+    if (result.length === 3) break;
+  }
+  return result;
 }

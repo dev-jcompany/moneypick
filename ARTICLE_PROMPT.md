@@ -1,11 +1,14 @@
 # MoneyPick Article 입력 프롬프트
 
+> **DEPRECATED / LEGACY WORKFLOW**
+> 신규 Article 작성의 기준 문서로 사용하지 않습니다. Article System V2 설계와 자동 Pipeline 규칙을 우선합니다.
+
 > Article System V2 안내: 이 문서는 독립 저장 규칙이 아니라 관리자 작성 화면에 넣을 초안을 만드는 보조 문서다. 저장 시 `/api/articles`의 Article Generation Core가 유형, 패턴, 구조화 summary/FAQ, 관련 계산기, 공식 확인처, validation을 공통 적용한다.
 
 ## 사용 방법
 
 1. 아래 프롬프트로 HTML 초안을 만든다.
-2. `/mp-console/articles/new`에서 제목, 카테고리, slug, 설명과 본문 HTML을 입력한다.
+2. 현재 관리자 기사 작성 화면에서 제목, 카테고리, slug, 설명과 본문 HTML을 입력한다.
 3. 관리자가 입력한 값은 Core 생성값보다 우선한다.
 4. 저장된 글은 반드시 검토한 뒤 발행한다.
 
@@ -23,13 +26,11 @@ MoneyPick 금융 정보 사이트의 Article 본문 HTML을 작성해 주세요.
 - 아래 허용 구조를 사용한 순수 HTML만 출력합니다.
 
 권장 구조:
-<div class="mp-summary">
-  <ul>
-    <li>독립적으로 이해되는 핵심 요약 1</li>
-    <li>독립적으로 이해되는 핵심 요약 2</li>
-    <li>독립적으로 이해되는 핵심 요약 3</li>
-  </ul>
-</div>
+<ul class="mp-summary">
+  <li>독립적으로 이해되는 핵심 요약 1</li>
+  <li>독립적으로 이해되는 핵심 요약 2</li>
+  <li>독립적으로 이해되는 핵심 요약 3</li>
+</ul>
 
 <h2>소제목</h2>
 <p>본문</p>
@@ -55,7 +56,8 @@ MoneyPick 금융 정보 사이트의 Article 본문 HTML을 작성해 주세요.
 
 ## Core 처리 규칙
 
-- `mp-summary` 항목은 DB의 `summary text[]`로 구조화된다.
+- `mp-summary`는 Legacy Article HTML compatibility format이며 `<ul class="mp-summary">`를 사용한다.
+- V2에서는 향후 `SummaryBlock`으로 대체한다.
 - `mp-faq`의 질문과 답변은 DB의 `faq jsonb`로 구조화된다.
 - 명시적인 구조화 값이 없으면 lead와 본문에서 안전하게 보완한다.
 - 관련 계산기와 공식 확인처는 기존 registry/engine을 재사용해 보완한다.
