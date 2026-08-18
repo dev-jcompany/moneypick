@@ -30,8 +30,8 @@ type ContentType =
   | 'CALCULATOR_FOCUSED' | 'POLICY_CHANGE' | 'HOW_TO' | 'TIPS_LIST';
   // CONTENT_TYPES_AND_PATTERNS.md §2
 
-interface ArticleSchemaV1 {
-  version: 1;
+interface ArticleSchemaV2 {
+  version: 2;
   contentType: ContentType;
   patternId: string;       // 예: 'COMPARISON_01' — 기존 article-patterns.json 키 그대로 재사용
   patternVariant?: string; // 예: 'COMPARISON_01-A' — 없으면 해당 패턴의 기본(A) Variant
