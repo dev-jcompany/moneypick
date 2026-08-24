@@ -1,9 +1,9 @@
-import type { ArticleSchemaBlock } from '@/lib/article-system/article-schema.mjs';
+import type { ArticleSchemaBlock, ArticleSchemaV2 } from '@/lib/article-system/article-schema.mjs';
 import { ARTICLE_CALCULATOR_OPTIONS } from '@/lib/article-calculators';
 import { OFFICIAL_AGENCIES } from '@/mcp/official-registry.mjs';
 
 type Props = {
-  blocks: ArticleSchemaBlock[];
+  schema: ArticleSchemaV2;
   accent: string;
   accentDark: string;
 };
@@ -18,7 +18,8 @@ function calculatorItems(block: Extract<ArticleSchemaBlock, { type: 'calculator'
   }).slice(0, 3);
 }
 
-export default function ArticleBlocksV2({ blocks, accent, accentDark }: Props) {
+export default function ArticleBlocksV2({ schema, accent, accentDark }: Props) {
+  const { blocks } = schema;
   return (
     <div className="mp-v2-blocks">
       {blocks.map((block, index) => {
@@ -56,6 +57,15 @@ export default function ArticleBlocksV2({ blocks, accent, accentDark }: Props) {
             const frameClass = block.variant === 'diagram' ? 'border border-slate-200 bg-white p-3 dark:border-navy-700 dark:bg-navy-900' : 'overflow-hidden';
             return <figure key={index} className={`my-8 ${widthClass}`}><div className={`rounded-2xl ${frameClass}`}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={block.src} alt={block.alt} loading="lazy" className="aspect-[16/9] w-full object-cover" /></div>{block.caption ? <figcaption className="mt-2 text-center text-sm leading-relaxed text-slate-500 dark:text-slate-400">{block.caption}</figcaption> : null}</figure>;
           }
+          case 'visual': {
+            const visual = schema.visuals?.find((item) => item.id === block.visualId);
+            if (!visual?.asset) return null;
+            return <figure key={index} className="my-8 w-full"><div className="overflow-hidden rounded-2xl bg-slate-50 dark:bg-navy-900">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={visual.asset.url} alt={visual.alt} width={visual.asset.width} height={visual.asset.height} loading="lazy" decoding="async" className="aspect-[16/9] h-auto w-full object-cover" /></div></figure>;
+          }
+          case 'numberResult':
+            return <section key={index} className={`my-8 rounded-2xl p-6 ${block.variant === 'HIGHLIGHT' ? 'bg-green-50 dark:bg-green-900/20' : 'border border-slate-200 dark:border-navy-700'}`}><p className="text-sm font-semibold text-slate-500 dark:text-slate-400">{block.label}</p><p className="mt-2 break-words text-3xl font-black tracking-tight" style={{ color: accentDark }}>{block.value}</p>{block.caption ? <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{block.caption}</p> : null}</section>;
+          case 'comparison':
+            return <figure key={index} className="my-8 overflow-x-auto">{block.caption ? <figcaption className="mb-3 font-bold">{block.caption}</figcaption> : null}<table className="min-w-[560px] w-full border-collapse text-left text-sm"><thead><tr>{block.headers.map((header, cellIndex) => <th key={cellIndex} className="border bg-slate-50 p-3 dark:bg-navy-800">{header}</th>)}</tr></thead><tbody>{block.rows.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex} className="border p-3">{cell}</td>)}</tr>)}</tbody></table></figure>;
           default:
             return null;
         }

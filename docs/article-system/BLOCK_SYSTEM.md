@@ -1,5 +1,15 @@
 # Block System 설계
 
+## 구현 업데이트 — AI Visual Vertical Slice (2026-08-24)
+
+- `numberResult`: `DEFAULT` / `HIGHLIGHT`, label·value·caption 구조
+- `comparison`: `TABLE` / `CARDS` 구조를 검증하며 초기 renderer는 모바일 overflow가 안전한 표 UI
+- `visual`: Schema의 `visualId`로 Asset을 조회하고 width/height·alt·lazy loading을 적용
+- 기존 `image`: 승인된 정적/Supabase URL 직접 연결 호환 Block으로 유지
+
+Renderer는 알 수 없는 Block을 개별 skip한다. Schema validator가 실패하면 Article 전체가
+Legacy HTML로 fallback한다.
+
 [← ARTICLE_SYSTEM_V2.md](./ARTICLE_SYSTEM_V2.md)
 
 원 작업지시서 §16~17(Block, Block Variant)에 대한 설계. 출발점은 이미 존재하는

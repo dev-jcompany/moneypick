@@ -208,7 +208,7 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
         </p>
 
         {useV2Renderer ? (
-          <ArticleBlocksV2 blocks={articleSchema.blocks} accent={theme.accent} accentDark={theme.accentDark} />
+          <ArticleBlocksV2 schema={articleSchema} accent={theme.accent} accentDark={theme.accentDark} />
         ) : bodyHtml ? (
           <div
             className="mp-body-html prose prose-lg max-w-none text-[#2b322e] dark:text-slate-300"

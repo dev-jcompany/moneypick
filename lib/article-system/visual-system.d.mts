@@ -1,0 +1,22 @@
+export type VisualPurpose = 'HERO' | 'CONCEPT' | 'EXPLANATION' | 'COMPARISON' | 'PROCESS' | 'SCENARIO';
+export type VisualComposition = 'OBJECT_FOCUS' | 'PERSON_OBJECT' | 'CENTER_FOCUS' | 'LEFT_RIGHT' | 'SIMPLE_PROCESS' | 'COMPARISON';
+export type VisualType = 'EDITORIAL' | 'NUMBER' | 'COMPARISON' | 'PROCESS' | 'DATA';
+export type PlannedVisual = {
+  id: string;
+  style: 'MONEYPICK_MINIMAL_FLAT';
+  type: VisualType;
+  purpose: VisualPurpose;
+  composition: VisualComposition;
+  visualSpec: { subject: string; objects: string[] };
+  alt: string;
+  asset?: { url: string; width: number; height: number; mimeType: string };
+};
+export const VISUAL_STYLE: 'MONEYPICK_MINIMAL_FLAT';
+export const VISUAL_PURPOSES: VisualPurpose[];
+export const VISUAL_COMPOSITIONS: VisualComposition[];
+export const VISUAL_TYPES: VisualType[];
+export const MAX_VISUALS_PER_ARTICLE: number;
+export function planArticleVisuals(input: { contentType: string; topic: string; count?: number }): PlannedVisual[];
+export function buildMoneyPickImagePrompt(visual: PlannedVisual, articleTopic: string): string;
+export function insertVisualBlocks(blocks: unknown[], visuals: PlannedVisual[]): unknown[];
+export function visualCountForArticle(input: { contentType: string; blockCount?: number }): number;

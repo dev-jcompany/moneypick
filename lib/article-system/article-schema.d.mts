@@ -1,4 +1,5 @@
 import type { CanonicalContentType } from './content-types.mjs';
+import type { PlannedVisual } from './visual-system.mjs';
 
 export type ArticleSchemaBlock =
   | { type: 'heading'; text: string }
@@ -12,7 +13,10 @@ export type ArticleSchemaBlock =
   | { type: 'summary'; variant: 'S1' | 'S2'; items: string[] }
   | { type: 'table'; variant: 'T1'; caption?: string; headers: string[]; rows: string[][] }
   | { type: 'officialSources'; variant: 'O1'; agencyIds: string[] }
-  | { type: 'image'; variant: 'wide' | 'split' | 'diagram'; src: string; alt: string; caption?: string };
+  | { type: 'image'; variant: 'wide' | 'split' | 'diagram'; src: string; alt: string; caption?: string }
+  | { type: 'visual'; visualId: string }
+  | { type: 'numberResult'; variant: 'DEFAULT' | 'HIGHLIGHT'; label: string; value: string; caption?: string }
+  | { type: 'comparison'; variant: 'TABLE' | 'CARDS'; caption?: string; headers: string[]; rows: string[][] };
 
 export interface ArticleSchemaV2 {
   version: 2;
@@ -20,6 +24,7 @@ export interface ArticleSchemaV2 {
   pattern: string;
   variant: string;
   blocks: ArticleSchemaBlock[];
+  visuals?: Array<PlannedVisual & { asset: { url: string; width: number; height: number; mimeType: 'image/webp' } }>;
   searchIntent?: string;
   thumbnailVariant?: string;
   displayMetadata?: Record<string, unknown>;

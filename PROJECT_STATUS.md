@@ -1,7 +1,18 @@
 # MoneyPick Project Status
 
 Updated: 2026-08-24
-Git baseline: `632a5d0` (`master`, synchronized with `origin/master`)
+Git baseline: `c749645` (`master`, synchronized with `origin/master` at Sprint start)
+
+## Article V2 Visual Sprint — local implementation complete, Production mutation pending
+
+- Added Visual registries/planning/prompt SSOT with `MONEYPICK_MINIMAL_FLAT`, six Purposes, six Compositions, five Types, and a hard limit of 3.
+- Added `visuals[]` asset metadata, `visual` references, `numberResult`, and `comparison` validation/rendering while preserving direct `image` and Legacy fallback.
+- Added a server-only OpenAI `gpt-image-2` adapter, one-retry ceiling, auth/credit/rate-limit classification, partial-failure continuation, Sharp WebP optimization, safe hashed paths, and service-role Supabase upload adapter.
+- Scheduled generation is opt-in with `IMAGE_GENERATION_ENABLED=true`; default behavior and existing Draft generation remain unchanged.
+- Generated three DSR E2E assets with distinct PERSON_OBJECT / CENTER_FOCUS / LEFT_RIGHT compositions and saved them under `public/images/articles/` at 1400×788 WebP (13–41KB).
+- Local Schema/Renderer E2E and responsive browser checks passed at 360px, 390px, and desktop. Production Storage upload and Draft creation were not executed because the standing security rule prohibits Production data-changing tests without separate operational approval.
+- Runtime configuration (not committed to `.env`): `OPENAI_API_KEY`, optional `IMAGE_GENERATION_MODEL` (default `gpt-image-2`), `IMAGE_GENERATION_ENABLED=true`, `IMAGE_GENERATION_RETRY=1`, optional `ARTICLE_IMAGE_BUCKET` (default `article-images`). Keys are server-only.
+- Cost guardrail: medium 1536×1024 is budgeted at approximately USD 0.05/image and USD 0.15 for a normal three-image article, plus small text-input and Storage costs. Reconfirm against the official OpenAI pricing calculator before enabling Production.
 
 ## Executive status
 

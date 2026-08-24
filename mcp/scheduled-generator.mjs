@@ -39,6 +39,16 @@ import {
   articleSchemaToLegacyHtml,
   validateArticleSchemaV2,
 } from '../lib/article-system/article-schema.mjs';
+import {
+  insertVisualBlocks,
+  planArticleVisuals,
+  visualCountForArticle,
+} from '../lib/article-system/visual-system.mjs';
+import {
+  createOpenAIImageProvider,
+  createSupabaseVisualStorage,
+  generateArticleVisualAssets,
+} from '../lib/article-system/image-pipeline.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -303,6 +313,31 @@ function buildArticleSchema(obj, contentType, patternId, variant, matchedSources
   return { version: 2, contentType, pattern: patternId, variant, blocks };
 }
 
+async function addGeneratedVisuals(articleSchema, obj) {
+  if (process.env.IMAGE_GENERATION_ENABLED !== 'true') return articleSchema;
+  const requested = visualCountForArticle({ contentType: articleSchema.contentType, blockCount: articleSchema.blocks.length });
+  const plan = planArticleVisuals({ contentType: articleSchema.contentType, topic: obj.title, count: requested });
+  if (!plan.length) return articleSchema;
+  try {
+    const result = await generateArticleVisualAssets({
+      articleId: obj.slug,
+      articleTopic: obj.title,
+      visuals: plan,
+      provider: createOpenAIImageProvider(),
+      storage: createSupabaseVisualStorage(),
+    });
+    if (!result.visuals.length) return articleSchema;
+    return {
+      ...articleSchema,
+      visuals: result.visuals,
+      blocks: insertVisualBlocks(articleSchema.blocks, result.visuals),
+    };
+  } catch (error) {
+    console.warn(`  Visual pipeline 실패 (본문 Draft 계속): ${error?.code ?? 'unknown'}`);
+    return articleSchema;
+  }
+}
+
 // ── Claude API 호출 ──
 async function generateDraft(client, systemPrompt, topic, topics, samples, extraBlocks = []) {
   const shots = pickShots(samples, topic.archetype);
@@ -533,6 +568,7 @@ async function main() {
         obj.articleType = typeResult.articleType;
         obj.patternId   = patternId;
         obj.articleSchema = buildArticleSchema(obj, typeResult.contentType, patternId, schemaVariant, matchedSources);
+        obj.articleSchema = await addGeneratedVisuals(obj.articleSchema, obj);
         obj.bodyHtml = articleSchemaToLegacyHtml(obj.articleSchema);
         obj.status   = 'draft';
         if (metaCharCount(obj.metaDescription) < 120 || metaCharCount(obj.metaDescription) > 180) {

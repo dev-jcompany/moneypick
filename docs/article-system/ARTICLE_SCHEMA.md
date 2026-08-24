@@ -3,6 +3,20 @@
 > 상태 (2026-08-24): Phase 1~3 구현 완료. `ArticleSchemaV2` envelope, block runtime validator,
 > nullable Production `article_schema` 컬럼, V2 Block Renderer와 legacy fallback이 적용되었다.
 
+## Visual System Vertical Slice (2026-08-24)
+
+`ArticleSchemaV2`는 선택적인 `visuals` 배열과 `{ type: 'visual', visualId }` Block을 지원한다.
+각 Visual은 `MONEYPICK_MINIMAL_FLAT` 고정 style, Purpose, Composition, visualSpec, 영구 Asset
+metadata(`url`, `width`, `height`, `mimeType`)를 가진다. Validator는 최대 3개, ID 중복,
+허용 Registry, 안전한 내부/Supabase public URL, WebP asset, 누락된 visualId 참조를 검사한다.
+
+호환 정책은 기존과 동일하다. Visual asset 또는 참조가 잘못된 Schema는 공개 화면에서 V2로
+실행하지 않고 Legacy renderer로 fallback한다. 런타임 중 개별 Asset이 없으면 VisualBlock만
+skip한다. 기존 직접 URL 방식의 `image` Block도 호환을 위해 유지한다.
+
+추가된 핵심 Block은 `numberResult`, `comparison`, `visual`이다. 정확한 금융 숫자는 AI 이미지가
+아니라 `numberResult` 같은 React UI Block으로 표시한다.
+
 [← ARTICLE_SYSTEM_V2.md](./ARTICLE_SYSTEM_V2.md)
 
 원 작업지시서 §21~22, §24에 대한 설계와 Phase 1 구현 상태를 기록한다.

@@ -102,4 +102,27 @@ describe('ArticleSchemaV2 envelope', () => {
     };
     expect(validateArticleSchemaV2(schema).errors).toContain('blocks[1] image is invalid');
   });
+
+  it('validates visual definitions and visualId references', () => {
+    const schema: ArticleSchemaV2 = {
+      ...validSchema,
+      visuals: [{
+        id: 'visual-01', style: 'MONEYPICK_MINIMAL_FLAT', type: 'EDITORIAL', purpose: 'CONCEPT', composition: 'PERSON_OBJECT',
+        visualSpec: { subject: 'DSR', objects: ['person', 'loan document'] },
+        asset: { url: 'https://example.supabase.co/storage/v1/object/public/article-images/articles/dsr/visual.webp', width: 1400, height: 788, mimeType: 'image/webp' },
+        alt: 'DSR 개념 설명 일러스트',
+      }],
+      blocks: [
+        { type: 'summary', variant: 'S1', items: ['요약'] },
+        { type: 'visual', visualId: 'visual-01' },
+        { type: 'numberResult', variant: 'HIGHLIGHT', label: '예시 DSR', value: '30%' },
+        { type: 'comparison', variant: 'TABLE', headers: ['구분', '낮음', '높음'], rows: [['부담', '여유', '주의']] },
+        { type: 'faq', items: [{ q: '질문', a: '답변' }] },
+      ],
+    };
+    expect(validateArticleSchemaV2(schema)).toEqual({ valid: true, errors: [] });
+    expect(articleSchemaToLegacyHtml(schema)).toContain('width="1400"');
+    expect(validateArticleSchemaV2({ ...schema, blocks: [...schema.blocks.slice(0, -1), { type: 'visual', visualId: 'visual-99' }, schema.blocks.at(-1)] }).errors)
+      .toContain('visual block references missing asset: visual-99');
+  });
 });
