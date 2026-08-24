@@ -35,6 +35,7 @@ Props 타입만 아래 확장 스키마로 넓힌다.
 | `faq` | 기존 | FAQ 아코디언 |
 | `summary` (신규) | 현재 body_html 안 raw HTML(`mp-summary`)로만 존재 → 정식 Block으로 승격 | 핵심 요약 |
 | `table` (신규) | body_html 안 raw `<table>`로만 존재 → 정식 Block化 | 데이터/비교 표 |
+| `image` (신규) | 승인된 내부/Supabase Storage 이미지 | 본문 설명 이미지·인포그래픽 |
 | `comparison` (신규) | — | A/B 비교 카드 |
 | `scenario` (신규) | 기존 `engine.mjs`의 `generateSampleScenarios()` 출력을 그대로 담는 그릇 | 계산 시나리오 |
 | `eligibility` (신규) | — | 자격/대상 조건 |

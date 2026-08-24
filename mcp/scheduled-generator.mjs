@@ -258,7 +258,7 @@ function buildUserPrompt(topic, siblings) {
     `- 글유형 스켈레톤: ${SKELETON[topic.archetype] ?? '시스템 규칙 참고'}`,
     `- 참고 태그: ${(topic.planTags || []).join(', ') || '(없음)'}`,
     `- articleSchemaBlocks: Article Schema V2 블록 배열. 첫 블록은 {"type":"summary","variant":"S1" 또는 "S2","items":[...]}이고, 마지막 부분에 {"type":"faq","items":[{"q":"...","a":"..."}]}를 반드시 포함하세요.`,
-    `- 허용 블록: heading{text}, paragraph{text}, checklist{title,items}, point{text}, warning{title?,text}, example{text}, calculator{items:[{label,href,caption?}]}, faq{items}, summary{variant,items}, table{variant:"T1",caption?,headers,rows}.`,
+    `- 허용 블록: heading{text}, paragraph{text}, checklist{title,items}, point{text}, warning{title?,text}, example{text}, calculator{items:[{label,href,caption?}]}, faq{items}, summary{variant,items}, table{variant:"T1",caption?,headers,rows}. image 블록은 시스템이 승인된 자산을 별도로 주입할 때만 사용합니다.`,
     `- calculator href는 제공된 /calculators/... 내부 경로만 사용하세요. HTML 대신 articleSchemaBlocks에 전체 본문 의미를 담으세요.`,
     ``,
     `recommended 후보(같은 카테고리 내 다른 글 — 관련된 3~4개 골라 slug 합리적으로 생성):`,

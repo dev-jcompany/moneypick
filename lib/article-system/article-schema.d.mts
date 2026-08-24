@@ -11,7 +11,8 @@ export type ArticleSchemaBlock =
   | { type: 'faq'; items: { q: string; a: string }[] }
   | { type: 'summary'; variant: 'S1' | 'S2'; items: string[] }
   | { type: 'table'; variant: 'T1'; caption?: string; headers: string[]; rows: string[][] }
-  | { type: 'officialSources'; variant: 'O1'; agencyIds: string[] };
+  | { type: 'officialSources'; variant: 'O1'; agencyIds: string[] }
+  | { type: 'image'; variant: 'wide' | 'split' | 'diagram'; src: string; alt: string; caption?: string };
 
 export interface ArticleSchemaV2 {
   version: 2;

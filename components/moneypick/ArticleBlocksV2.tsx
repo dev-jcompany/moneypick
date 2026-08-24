@@ -51,6 +51,11 @@ export default function ArticleBlocksV2({ blocks, accent, accentDark }: Props) {
             if (!agencies.length) return null;
             return <section key={index} className="my-8 rounded-2xl border border-slate-200 p-6 dark:border-navy-700"><h2 className="mb-4 text-xl font-extrabold">공식 확인처</h2><ul className="space-y-3">{agencies.map((agency) => <li key={agency.id}><a href={agency.url} target="_blank" rel="noopener noreferrer" className="font-bold underline">{agency.name}</a><p className="text-sm text-slate-600 dark:text-slate-400">{agency.description}</p></li>)}</ul></section>;
           }
+          case 'image': {
+            const widthClass = block.variant === 'split' ? 'mx-auto max-w-2xl' : 'w-full';
+            const frameClass = block.variant === 'diagram' ? 'border border-slate-200 bg-white p-3 dark:border-navy-700 dark:bg-navy-900' : 'overflow-hidden';
+            return <figure key={index} className={`my-8 ${widthClass}`}><div className={`rounded-2xl ${frameClass}`}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={block.src} alt={block.alt} loading="lazy" className="aspect-[16/9] w-full object-cover" /></div>{block.caption ? <figcaption className="mt-2 text-center text-sm leading-relaxed text-slate-500 dark:text-slate-400">{block.caption}</figcaption> : null}</figure>;
+          }
           default:
             return null;
         }

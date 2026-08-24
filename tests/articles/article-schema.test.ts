@@ -75,4 +75,31 @@ describe('ArticleSchemaV2 envelope', () => {
 
     expect(validateArticleSchemaV2(schema).errors).toContain('blocks[1] calculator items are invalid');
   });
+
+  it('accepts approved article images and escapes compatibility captions', () => {
+    const schema: ArticleSchemaV2 = {
+      ...validSchema,
+      blocks: [
+        { type: 'summary', variant: 'S1', items: ['요약'] },
+        { type: 'image', variant: 'diagram', src: '/images/articles/resignation-four-month-runway.webp', alt: '퇴사 후 생활비 구성', caption: '<월별 계획>' },
+        { type: 'faq', items: [{ q: '질문', a: '답변' }] },
+      ],
+    };
+    expect(validateArticleSchemaV2(schema)).toEqual({ valid: true, errors: [] });
+    const html = articleSchemaToLegacyHtml(schema);
+    expect(html).toContain('loading="lazy"');
+    expect(html).toContain('&lt;월별 계획&gt;');
+  });
+
+  it('rejects unapproved image protocols and missing alt text', () => {
+    const schema = {
+      ...validSchema,
+      blocks: [
+        { type: 'summary', variant: 'S1', items: ['요약'] },
+        { type: 'image', variant: 'wide', src: 'javascript:alert(1)', alt: '' },
+        { type: 'faq', items: [{ q: '질문', a: '답변' }] },
+      ],
+    };
+    expect(validateArticleSchemaV2(schema).errors).toContain('blocks[1] image is invalid');
+  });
 });

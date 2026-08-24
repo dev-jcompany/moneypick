@@ -67,6 +67,7 @@ describe('MoneyPickArticle legacy compatibility', () => {
             { type: 'heading', text: 'V2 제목' },
             { type: 'paragraph', text: 'V2 본문' },
             { type: 'table', variant: 'T1', caption: '비교표', headers: ['항목', '값'], rows: [['금리', '3%']] },
+            { type: 'image', variant: 'wide', src: '/images/articles/resignation-case-planning.webp', alt: '퇴사 자금 계획', caption: '테스트 이미지' },
             { type: 'calculator', items: [{ label: 'DSR 계산기', href: '/calculators/dsr' }] },
             { type: 'officialSources', variant: 'O1', agencyIds: ['fsc'] },
             { type: 'faq', items: [{ q: 'V2 질문', a: 'V2 답변' }] },
@@ -79,6 +80,8 @@ describe('MoneyPickArticle legacy compatibility', () => {
     expect(html).toContain('비교표');
     expect(html).toContain('/calculators/dsr');
     expect(html).toContain('금융위원회');
+    expect(html).toContain('/images/articles/resignation-case-planning.webp');
+    expect(html).toContain('테스트 이미지');
     expect(html).toContain('V2 질문');
     expect(html).not.toContain('기존 HTML 본문');
   });
