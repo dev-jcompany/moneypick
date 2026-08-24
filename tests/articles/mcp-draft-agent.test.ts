@@ -30,6 +30,7 @@ describe('moneypick draft MCP agent', () => {
     expect(properties).toHaveProperty('faq');
     expect(properties).toHaveProperty('articleType');
     expect(properties).toHaveProperty('patternId');
+    expect(properties).toHaveProperty('articleSchema');
     expect(properties).toHaveProperty('relatedCalculators');
   });
 });

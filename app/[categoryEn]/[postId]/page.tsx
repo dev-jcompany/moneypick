@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import Breadcrumb from '@/components/Breadcrumb';
 import MoneyPickArticle from '@/components/moneypick/MoneyPickArticle';
-import type { MoneyPickArticleProps, CategoryKey } from '@/components/moneypick/types';
+import ArticleViewTracker from '@/components/moneypick/ArticleViewTracker';
+import ArticleCardV2 from '@/components/moneypick/ArticleCardV2';
+import type { MoneyPickArticleProps } from '@/components/moneypick/types';
 import AdColumn from '@/components/post/AdColumn';
 import DetailPromoSection from '@/components/post/DetailPromoSection';
 import PostDetailView from '@/components/post/PostDetailView';
@@ -16,7 +18,8 @@ import {
   getVisibleCategories,
   getVisibleCategoryByPath,
 } from '@/lib/db';
-import { getArticleCategoryPath, getArticleUrl, CATEGORY_HERO_COLOR } from '@/lib/article-url';
+import { getArticleCategoryPath, getArticleUrl } from '@/lib/article-url';
+import { performanceDimensions } from '@/lib/article-system/display.mjs';
 import { categories } from '@/src/data/categories';
 import { staticArticles } from '@/src/data/articles';
 import { allPosts, popularPosts } from '@/src/data/posts';
@@ -129,6 +132,7 @@ export default async function CategoryContentPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-[1500px] px-4 pb-10 pt-5 md:pb-14 md:pt-6">
+      {dbArticle && <ArticleViewTracker dimensions={performanceDimensions({ id: dbArticle._id, article_schema: dbArticle.articleSchema }, 'article_detail', 'standard')} />}
       <Breadcrumb items={[{ label: article.categoryLabel, href: `/${getArticleCategoryPath(article.categoryKey)}` }, { label: article.title }]} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,940px)_300px] lg:justify-center xl:grid-cols-[minmax(900px,980px)_minmax(320px,360px)] xl:gap-8 widescreen:grid-cols-[minmax(0,980px)_220px_minmax(240px,260px)] widescreen:gap-5">
@@ -147,35 +151,7 @@ export default async function CategoryContentPage({ params }: Props) {
             함께 보면 좋은 콘텐츠
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {relatedArticles.map((related) => (
-              <a
-                key={related.id}
-                href={getArticleUrl(related.category_key, related.slug)}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-[#e2e8e5] bg-white transition hover:border-[#21A05A] hover:shadow-md dark:border-white/10 dark:bg-navy-900"
-              >
-                {related.thumbnail_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={related.thumbnail_url} alt={related.title} className="h-36 w-full object-cover" />
-                ) : (
-                  <div
-                    className="flex h-36 w-full items-center justify-center text-3xl"
-                    style={{ backgroundColor: CATEGORY_HERO_COLOR[related.category_key as CategoryKey] ?? '#27ab63' }}
-                  >
-                    💡
-                  </div>
-                )}
-                <div className="flex flex-1 flex-col p-4">
-                  <span className="mb-1.5 text-[11px] font-bold text-[#21A05A]">{related.category_label}</span>
-                  <p className="flex-1 text-[14px] font-extrabold leading-snug text-[#1a1d1f] group-hover:text-[#21A05A] dark:text-white">
-                    {related.title}
-                  </p>
-                  <div className="mt-2 flex items-center gap-2 text-[11px] text-[#b0bab4]">
-                    {related.reading_time && <span>{related.reading_time} 읽기</span>}
-                    <span>{related.created_at.slice(0, 10).replace(/-/g, '.')}</span>
-                  </div>
-                </div>
-              </a>
-            ))}
+            {relatedArticles.map((related, index) => <ArticleCardV2 key={related.id} article={related} index={index} placement="article_related" />)}
           </div>
         </div>
       )}

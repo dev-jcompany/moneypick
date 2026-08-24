@@ -4,6 +4,7 @@ import { adminPath } from '@/lib/admin-path';
 import { createArticleThumbnail } from '@/lib/article-thumbnail';
 import { createArticleThroughPipeline } from '@/lib/articles/persistence';
 import type { ArticleSavePayload } from '@/lib/db';
+import { isArticleSchemaV2, validateArticleSchemaV2 } from '@/lib/article-system/article-schema.mjs';
 
 export const runtime = 'nodejs';
 
@@ -29,6 +30,7 @@ type DraftRequestBody = {
   summaryItems?: unknown;
   faq?: unknown;
   relatedCalculators?: unknown;
+  articleSchema?: unknown;
 };
 
 const CATEGORY_MAP: Record<string, { key: string; label: string }> = {
@@ -198,6 +200,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'tags는 문자열 배열이어야 합니다.' }, { status: 400 });
     }
 
+    const articleSchemaValidation = body.articleSchema == null
+      ? { valid: true, errors: [] }
+      : validateArticleSchemaV2(body.articleSchema);
+    if (!articleSchemaValidation.valid || (body.articleSchema != null && !isArticleSchemaV2(body.articleSchema))) {
+      return NextResponse.json(
+        { error: `articleSchema가 유효하지 않습니다: ${articleSchemaValidation.errors.join(', ')}` },
+        { status: 400 },
+      );
+    }
+
     const seoTitle = optionalString(body.seoTitle);
     const metaDescription = buildMetaDescription(optionalString(body.metaDescription), summary.value);
     const lead = summary.value;
@@ -241,6 +253,7 @@ export async function POST(req: NextRequest) {
       recommended_slugs: Array.isArray(body.relatedSlugs)
         ? (body.relatedSlugs as unknown[]).filter((s): s is string => typeof s === 'string').slice(0, 10)
         : null,
+      article_schema: isArticleSchemaV2(body.articleSchema) ? body.articleSchema : null,
     };
 
     const result = await createArticleThroughPipeline(payload);

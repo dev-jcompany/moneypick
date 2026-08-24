@@ -28,6 +28,7 @@ export interface MoneyPickArticleProps {
   thumbnailUrl?: string;
   blocks?: ArticleBlock[];
   bodyHtml?: string;
+  articleSchema?: ArticleSchemaV2 | null;
   summary?: string[];
   relatedCalculators?: { label: string; href: string }[];
   recommendedContent?: { title: string; category: string; href: string; emoji?: string; views?: number }[];

@@ -8,6 +8,7 @@ const titleMap: Record<string, string> = {
   [adminPath()]: '운영 대시보드',
   [adminPath('/articles')]: '글 목록',
   [adminPath('/articles/new')]: '새 글 작성',
+  [adminPath('/articles/performance')]: '아티클 성과',
   [adminPath('/categories')]: '카테고리 설정',
   [adminPath('/inquiries')]: '문의함',
   [adminPath('/subscribers')]: '뉴스레터 신청자 관리',
@@ -19,7 +20,7 @@ const titleMap: Record<string, string> = {
 
 export default function AdminHeader() {
   const pathname = toPublicAdminPath(usePathname());
-  const title = pathname.startsWith(adminPath('/articles/')) && pathname !== adminPath('/articles/new') ? '글 수정' : pathname.startsWith(adminPath('/notices/')) && pathname !== adminPath('/notices/new') ? '공지사항 수정' : titleMap[pathname] ?? '머니픽 관리자';
+  const title = titleMap[pathname] ?? (pathname.startsWith(adminPath('/articles/')) ? '글 수정' : pathname.startsWith(adminPath('/notices/')) && pathname !== adminPath('/notices/new') ? '공지사항 수정' : '머니픽 관리자');
   return (
     <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-[#E4EAE7] bg-white/95 px-5 pl-20 backdrop-blur lg:px-8">
       <div><p className="text-xs font-bold text-[#21A05A]">MONEYPICK ADMIN</p><h1 className="text-xl font-extrabold text-[#17211D]">{title}</h1></div>

@@ -112,6 +112,11 @@ async function handleMessage(rawMessage) {
                   metaDescription: { type: 'string', description: 'Meta description' },
                   articleType: { type: 'string', description: 'Optional existing MoneyPick article type override' },
                   patternId: { type: 'string', description: 'Optional existing MoneyPick pattern id override' },
+                  articleSchema: {
+                    type: 'object',
+                    description: 'Optional validated Article Schema V2 envelope',
+                    additionalProperties: true,
+                  },
                   relatedCalculators: {
                     type: 'array',
                     items: { type: 'string' },
@@ -185,6 +190,7 @@ async function saveDraft(args) {
       metaDescription: optionalString(args.metaDescription),
       articleType: optionalString(args.articleType),
       patternId: optionalString(args.patternId),
+      articleSchema: args.articleSchema && typeof args.articleSchema === 'object' ? args.articleSchema : null,
       relatedCalculators: Array.isArray(args.relatedCalculators) ? args.relatedCalculators : [],
       status: 'draft',
       source: 'claude_desktop',

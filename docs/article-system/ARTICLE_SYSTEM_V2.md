@@ -4,6 +4,13 @@
 Git 기준: `master` / `43ec944`
 작업 유형: 현황조사 / 아키텍처 설계 (구현 없음)
 
+> **Historical architecture baseline:** 이 문서의 현황조사는 `43ec944` 시점의 기록이다.
+> 현재 구현은 `632a5d0` 이후 작업 기준으로 Phase 0부터 Phase 7까지 구현됐다.
+> Content Type Registry, nullable `article_schema` JSONB, V2 envelope/validator가 구현됐고 기존 행은
+> `NULL` 상태로 legacy 렌더링을 유지한다. 유효한 Schema는 V2 Block Renderer를 사용하고,
+> 관리자 폼과 기존 Article Agent가 V2 Schema를 지원하고, DB 기반 Card Variant와 성과 차원
+> 수집/관리자 기준선까지 연결됐다. 최신 운영 상태는 [`PROJECT_STATUS.md`](../../PROJECT_STATUS.md)를 참조한다.
+
 이 문서는 Article System V2 작업지시서(2026-08-17)의 최종 산출물이다. 이번 단계에서는 코드를
 수정하지 않았다. 실제 저장소 코드를 읽고 확인한 사실만 기록했으며, 추정이 필요한 부분은 "추정"으로
 명시했다.
@@ -343,6 +350,8 @@ Article Schema뿐이다.
 
 ## 7. 구현 Roadmap
 
+현재 상태(2026-08-24): Phase 0~7 구현 완료. 외부 GA/Search Console 수집 확인은 배포 후 운영 검증 항목이다.
+
 | Phase | 범위 | 수정 예상 영역 | 난이도 | 선행조건 | 우선순위 |
 | --- | --- | --- | --- | --- | --- |
 | 0 | 즉시 고칠 수 있는 불일치 수정(§8 완료조건 답변에도 명시): mp-summary 형식 통일, CTA 1개→N개 표시, ARTICLE_PROMPT.md deprecated 표시 | `MoneyPickArticle.tsx`, `ArticleEditorForm.tsx` 안내 텍스트, `ARTICLE_PROMPT.md` | 작음 | 없음 | P1 |
@@ -407,7 +416,7 @@ Article Schema뿐이다.
 
 ---
 
-## 9. 다음 작업 추천
+## 9. 다음 작업 추천 (historical)
 
 **1개만 추천한다.**
 
@@ -423,3 +432,9 @@ Component 구현)로 넘어갈 기반이 만들어진다.
 경로 무변경), 이후 모든 Phase가 이 매핑표와 컬럼 위에 쌓이므로 다음 Sprint로 적합하다.
 
 이 작업 완료 후 새로운 작업을 시작하지 않고 결과를 먼저 보고한다.
+
+위 추천 작업은 `632a5d0`에서 완료됐고 Phase 2 + Phase 3 최소 Vertical Slice도 2026-08-24에
+구현됐다. Phase 4 Admin V2 form도 Legacy/V2 모드 선택, Content Type/Pattern/Variant 입력,
+구조화 블록 검증, 호환 HTML 자동 생성까지 구현됐다. Phase 5~7도 기존 생성기의 V2 출력,
+DB 기반 카드 변형, GA 호환 성과 차원과 관리자 내부 조회수 기준선으로 구현됐다. 기존 데이터
+backfill은 수행하지 않는다.

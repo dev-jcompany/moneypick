@@ -2,6 +2,8 @@ import React from 'react';
 import type { MoneyPickArticleProps, ArticleBlock, CategoryKey } from './types';
 import { sanitizePostHtml } from '@/lib/sanitize';
 import { normalizeRelatedCalculators } from '@/lib/article-calculators';
+import { isArticleSchemaV2 } from '@/lib/article-system/article-schema.mjs';
+import ArticleBlocksV2 from './ArticleBlocksV2';
 
 const CATEGORY_THEME: Record<
   CategoryKey,
@@ -125,7 +127,7 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
   const {
     categoryKey, categoryLabel, title, date, updateDate, readingTime, views,
     editor = '머니픽 에디터', authorPostCount = 142,
-    heroStat, lead, thumbnailUrl, blocks, bodyHtml,
+    heroStat, lead, thumbnailUrl, blocks, bodyHtml, articleSchema,
     summary, relatedCalculators, recommendedContent,
     tags, related, disclaimer,
   } = props;
@@ -139,6 +141,7 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
     .flatMap((b) => b.items);
   const visibleSummary = getVisibleSummary(summary, lead);
   const visibleCalculators = normalizeRelatedCalculators(relatedCalculators, categoryKey);
+  const useV2Renderer = isArticleSchemaV2(articleSchema);
 
   return (
     <article
@@ -184,7 +187,7 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
       </header>
 
       {/* ── 핵심 요약 박스 ── */}
-      {visibleSummary.length > 0 && (
+      {!useV2Renderer && visibleSummary.length > 0 && (
         <section className="border-b border-[#d4eddf] bg-[#f0faf5] px-6 py-5 dark:border-green-900/30 dark:bg-green-900/20 md:px-12">
           <p className="mb-3 text-[15px] font-extrabold" style={{ color: theme.accentDark }}>핵심 요약</p>
           <ul className="space-y-2">
@@ -204,7 +207,9 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
           {renderInline(lead)}
         </p>
 
-        {bodyHtml ? (
+        {useV2Renderer ? (
+          <ArticleBlocksV2 blocks={articleSchema.blocks} accent={theme.accent} accentDark={theme.accentDark} />
+        ) : bodyHtml ? (
           <div
             className="mp-body-html prose prose-lg max-w-none text-[#2b322e] dark:text-slate-300"
             dangerouslySetInnerHTML={{ __html: sanitizePostHtml(bodyHtml) }}
@@ -214,7 +219,7 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
         )}
 
         {/* ── 관련 계산기 CTA ── */}
-        {visibleCalculators.length > 0 && (
+        {!useV2Renderer && visibleCalculators.length > 0 && (
           <section className="mt-10 rounded-2xl border border-[#c8e8d4] bg-[#f0faf5] p-6 dark:border-green-900/30 dark:bg-green-900/15">
             <p className="mb-4 text-[17px] font-extrabold text-[#1a1d1b] dark:text-white">이 글과 관련된 계산기</p>
             <div className="flex flex-wrap gap-3">
@@ -229,7 +234,7 @@ export default function MoneyPickArticle(props: MoneyPickArticleProps) {
         )}
 
         {/* ── FAQ ── */}
-        {faqItems.length > 0 && (
+        {!useV2Renderer && faqItems.length > 0 && (
           <section className="mt-10">
             <h2 className="mb-4 text-[20px] font-extrabold text-[#1a1d1b] dark:text-white">자주 묻는 질문</h2>
             <div className="overflow-hidden rounded-xl bg-[#0f1a2e]">

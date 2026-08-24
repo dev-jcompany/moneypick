@@ -12,6 +12,7 @@ const groups = [
     items: [
       { href: adminPath('/articles/new'), label: '새 글 작성' },
       { href: adminPath('/articles'), label: '글 목록', matchPrefix: true },
+      { href: adminPath('/articles/performance'), label: '아티클 성과' },
       { href: adminPath('/categories'), label: '카테고리 관리' },
       { href: adminPath('/tags'), label: '태그 관리' },
     ],
@@ -63,6 +64,7 @@ export default function AdminSidebar() {
 
   const isActive = (href: string, matchPrefix?: boolean) => {
     if (pathname === href) return true;
+    if (href === adminPath('/articles') && pathname === adminPath('/articles/performance')) return false;
     if (matchPrefix && pathname.startsWith(href + '/') && pathname !== adminPath('/notices/new') && pathname !== adminPath('/articles/new')) return true;
     return false;
   };

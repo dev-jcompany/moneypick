@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import {
   CANONICAL_CONTENT_TYPES,
   mapLegacyArchetype,
   mapLegacyArticleType,
+  allowedPatternsFor,
 } from '../../lib/article-system/content-types.mjs';
-import { selectArticleType } from '../../mcp/pattern-selector.mjs';
+import { pickPattern, selectArticleType } from '../../mcp/pattern-selector.mjs';
 
 describe('canonical content type registry', () => {
   it('defines the eight canonical content types', () => {
@@ -40,5 +42,12 @@ describe('canonical content type registry', () => {
     ['비교형', 'COMPARISON', 'COMPARISON'],
   ])('adds canonical information without expanding legacy DB articleType', (archetype, articleType, contentType) => {
     expect(selectArticleType({ archetype })).toMatchObject({ articleType, contentType });
+  });
+
+  it.each(['HOW_TO', 'TIPS_LIST'] as const)('has executable canonical patterns for %s', (contentType) => {
+    const patterns = JSON.parse(readFileSync('mcp/article-patterns.json', 'utf8'));
+    const selected = pickPattern(contentType, [], patterns);
+    expect(allowedPatternsFor(contentType)).toContain(selected.patternId);
+    expect(selected.pattern).toBeTruthy();
   });
 });

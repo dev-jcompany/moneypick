@@ -7,6 +7,17 @@ import type { ArticleSavePayload } from '@/lib/db';
 import { getArticleCategoryKeyFromPath, getArticleUrl } from '@/lib/article-url';
 import { ARTICLE_CALCULATOR_OPTIONS, getDefaultRelatedCalculators } from '@/lib/article-calculators';
 import { adminPath } from '@/lib/admin-path';
+import {
+  CANONICAL_CONTENT_TYPES,
+  CONTENT_TYPE_REGISTRY,
+  allowedPatternsFor,
+  type CanonicalContentType,
+} from '@/lib/article-system/content-types.mjs';
+import {
+  articleSchemaToLegacyHtml,
+  isArticleSchemaV2,
+  validateArticleSchemaV2,
+} from '@/lib/article-system/article-schema.mjs';
 import type { Category } from '@/src/types';
 
 type ArticleStatus = 'draft' | 'published';
@@ -21,6 +32,13 @@ const DEFAULT_CATEGORIES: CategoryOption[] = [
   { key: 'tax', label: '세금 절약법' },
   { key: 'work', label: '직장인 머니' },
   { key: 'invest', label: '투자 첫걸음' },
+];
+
+const DEFAULT_V2_BLOCKS = [
+  { type: 'summary', variant: 'S1', items: ['핵심 내용을 입력하세요.'] },
+  { type: 'heading', text: '첫 번째 소제목' },
+  { type: 'paragraph', text: '본문 내용을 입력하세요.' },
+  { type: 'faq', items: [{ q: '자주 묻는 질문을 입력하세요.', a: '답변을 입력하세요.' }] },
 ];
 
 function toSlug(title: string) {
@@ -98,6 +116,7 @@ export default function ArticleEditorForm({ existing }: Props) {
   const router = useRouter();
   const isEdit = !!existing;
   const fallbackHeroStat = splitHeroStat(existing?.summary?.[0] ?? existing?.lead ?? '');
+  const existingSchema = isArticleSchemaV2(existing?.article_schema) ? existing.article_schema : null;
 
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>(DEFAULT_CATEGORIES);
   const [categoryKey, setCategoryKey] = useState<string>(existing?.category_key ?? 'loan');
@@ -106,6 +125,13 @@ export default function ArticleEditorForm({ existing }: Props) {
   const [slugManual, setSlugManual] = useState(isEdit);
   const [metaDescription, setMetaDescription] = useState(existing?.meta_description ?? '');
   const [bodyHtml, setBodyHtml] = useState(existing?.body_html ?? '');
+  const [editorMode, setEditorMode] = useState<'legacy' | 'v2'>(existingSchema ? 'v2' : 'legacy');
+  const [contentType, setContentType] = useState<CanonicalContentType>(existingSchema?.contentType ?? 'GUIDE');
+  const [pattern, setPattern] = useState(existingSchema?.pattern ?? allowedPatternsFor('GUIDE')[0]);
+  const [schemaVariant, setSchemaVariant] = useState(existingSchema?.variant ?? 'A');
+  const [blocksJson, setBlocksJson] = useState(
+    JSON.stringify(existingSchema?.blocks ?? DEFAULT_V2_BLOCKS, null, 2),
+  );
   const [heroValue, setHeroValue] = useState(existing?.hero_value ?? fallbackHeroStat.value);
   const [heroLabel, setHeroLabel] = useState(existing?.hero_label ?? fallbackHeroStat.label);
   const [readingTime, setReadingTime] = useState(existing?.reading_time ?? '');
@@ -174,7 +200,7 @@ export default function ArticleEditorForm({ existing }: Props) {
       setError('제목을 입력해주세요.');
       return;
     }
-    if (!bodyHtml.trim()) {
+    if (editorMode === 'legacy' && !bodyHtml.trim()) {
       setError('본문 HTML을 입력해주세요.');
       return;
     }
@@ -187,6 +213,39 @@ export default function ArticleEditorForm({ existing }: Props) {
       return;
     }
 
+    let resolvedBodyHtml = bodyHtml.trim();
+    let articleSchema: ArticleSavePayload['article_schema'] = null;
+
+    if (editorMode === 'v2') {
+      let parsedBlocks: unknown;
+      try {
+        parsedBlocks = JSON.parse(blocksJson);
+      } catch {
+        setError('V2 블록 JSON 문법을 확인해주세요.');
+        return;
+      }
+
+      const candidate = {
+        version: 2,
+        contentType,
+        pattern,
+        variant: schemaVariant.trim(),
+        blocks: parsedBlocks,
+      };
+      const validation = validateArticleSchemaV2(candidate);
+      if (!validation.valid || !isArticleSchemaV2(candidate)) {
+        setError(`V2 스키마 오류: ${validation.errors.join(', ')}`);
+        return;
+      }
+
+      articleSchema = candidate;
+      resolvedBodyHtml = articleSchemaToLegacyHtml(candidate);
+      if (!resolvedBodyHtml) {
+        setError('호환 본문을 생성할 수 있는 블록이 필요합니다.');
+        return;
+      }
+    }
+
     setSaving(true);
     setError('');
 
@@ -197,7 +256,7 @@ export default function ArticleEditorForm({ existing }: Props) {
       title: title.trim(),
       lead: existing?.lead?.trim() || metaDescription.trim(),
       meta_description: metaDescription.trim() || null,
-      body_html: bodyHtml.trim(),
+      body_html: resolvedBodyHtml,
       summary: existing?.summary ?? [],
       faq: existing?.faq ?? [],
       tags: tags
@@ -213,9 +272,10 @@ export default function ArticleEditorForm({ existing }: Props) {
       thumbnail_url: trimmedThumbnailUrl || null,
       status,
       source: existing?.source ?? 'admin',
-      article_type: existing?.article_type ?? null,
-      pattern_id: existing?.pattern_id ?? null,
+      article_type: editorMode === 'v2' ? contentType : existing?.article_type ?? null,
+      pattern_id: editorMode === 'v2' ? pattern : existing?.pattern_id ?? null,
       recommended_slugs: existing?.recommended_slugs ?? null,
+      article_schema: articleSchema,
     };
 
     const url = isEdit ? `/api/articles/${existing.id}` : '/api/articles';
@@ -507,31 +567,88 @@ export default function ArticleEditorForm({ existing }: Props) {
         </button>
       </Card>
 
-      <Card title="본문 HTML *">
-        <div className="mb-3 rounded-xl bg-[#f4f9f6] p-4 text-[13px] text-[#4a5952]">
-          <p className="mb-2 font-bold text-[#21A05A]">생성한 HTML을 그대로 붙여넣으세요.</p>
-          <div className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
-            <span>
-              <code className="rounded bg-white px-1">&lt;div class=&quot;mp-summary&quot;&gt;</code> 핵심요약
-            </span>
-            <span>
-              <code className="rounded bg-white px-1">&lt;h2&gt;</code> 소제목
-            </span>
-            <span>
-              <code className="rounded bg-white px-1">&lt;div class=&quot;mp-point&quot;&gt;</code> 강조 박스
-            </span>
-            <span>
-              <code className="rounded bg-white px-1">&lt;div class=&quot;mp-warning&quot;&gt;</code> 주의 박스
-            </span>
-          </div>
+      <Card title="본문 형식 *">
+        <div className="grid gap-2 sm:grid-cols-2">
+          {([
+            ['legacy', '기존 HTML', '기존 게시글과 직접 작성한 HTML'],
+            ['v2', 'Article Schema V2', '구조화 블록을 검증한 뒤 저장'],
+          ] as const).map(([mode, label, description]) => (
+            <label key={mode} className="flex cursor-pointer gap-3 rounded-xl border border-[#d7dbd8] p-3">
+              <input
+                type="radio"
+                name="editor-mode"
+                checked={editorMode === mode}
+                onChange={() => setEditorMode(mode)}
+                className="mt-1 h-4 w-4 accent-[#21A05A]"
+              />
+              <span>
+                <strong className="block text-[14px] text-[#1a1d1f]">{label}</strong>
+                <span className="text-[12px] text-[#7a827d]">{description}</span>
+              </span>
+            </label>
+          ))}
         </div>
-        <textarea
-          value={bodyHtml}
-          onChange={(event) => setBodyHtml(event.target.value)}
-          rows={24}
-          placeholder={`<div class="mp-summary">\n  <ul>\n    <li>핵심 포인트 1</li>\n    <li>핵심 포인트 2</li>\n  </ul>\n</div>\n\n<h2>소제목</h2>\n<p>본문 내용...</p>`}
-          className="w-full rounded-lg border border-[#d7dbd8] px-3 py-2.5 font-mono text-[13px] leading-relaxed"
-        />
+
+        {editorMode === 'legacy' ? (
+          <>
+            <div className="rounded-xl bg-[#f4f9f6] p-4 text-[13px] text-[#4a5952]">
+              생성한 HTML을 붙여넣으세요. 저장 시 기존 렌더링 경로를 사용합니다.
+            </div>
+            <textarea
+              value={bodyHtml}
+              onChange={(event) => setBodyHtml(event.target.value)}
+              rows={24}
+              placeholder={`<div class="mp-summary">\n  <ul>\n    <li>핵심 포인트 1</li>\n  </ul>\n</div>\n\n<h2>소제목</h2>\n<p>본문 내용...</p>`}
+              className="w-full rounded-lg border border-[#d7dbd8] px-3 py-2.5 font-mono text-[13px] leading-relaxed"
+            />
+          </>
+        ) : (
+          <>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Row label="콘텐츠 유형">
+                <select
+                  value={contentType}
+                  onChange={(event) => {
+                    const nextType = event.target.value as CanonicalContentType;
+                    setContentType(nextType);
+                    setPattern(allowedPatternsFor(nextType)[0]);
+                  }}
+                  className="w-full rounded-lg border border-[#d7dbd8] px-3 py-2 text-[13px]"
+                >
+                  {CANONICAL_CONTENT_TYPES.map((type) => (
+                    <option key={type} value={type}>{CONTENT_TYPE_REGISTRY[type].label}</option>
+                  ))}
+                </select>
+              </Row>
+              <Row label="패턴">
+                <select
+                  value={pattern}
+                  onChange={(event) => setPattern(event.target.value)}
+                  className="w-full rounded-lg border border-[#d7dbd8] px-3 py-2 text-[13px]"
+                >
+                  {allowedPatternsFor(contentType).map((value) => <option key={value}>{value}</option>)}
+                </select>
+              </Row>
+              <Row label="변형 ID">
+                <input
+                  value={schemaVariant}
+                  onChange={(event) => setSchemaVariant(event.target.value)}
+                  className="w-full rounded-lg border border-[#d7dbd8] px-3 py-2 text-[13px]"
+                />
+              </Row>
+            </div>
+            <div className="rounded-xl bg-[#f4f9f6] p-4 text-[13px] text-[#4a5952]">
+              블록 배열만 JSON으로 입력합니다. 첫 블록은 <code>summary</code>여야 하며 <code>faq</code> 블록이 반드시 필요합니다. 저장 시 서버 호환용 HTML도 자동 생성됩니다.
+            </div>
+            <textarea
+              value={blocksJson}
+              onChange={(event) => setBlocksJson(event.target.value)}
+              rows={28}
+              spellCheck={false}
+              className="w-full rounded-lg border border-[#d7dbd8] px-3 py-2.5 font-mono text-[13px] leading-relaxed"
+            />
+          </>
+        )}
       </Card>
 
       <Card title="태그 및 면책조항">

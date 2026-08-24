@@ -2,7 +2,7 @@
 
 ## 결론
 
-현재 저장소의 Next.js 취약 버전과 관리자 페이지의 Proxy 단독 인증 의존은 해소했다. 다만 Production 환경변수와 Supabase RLS는 운영 환경에서 아직 검증되지 않았으므로 배포 완료 상태로 간주하지 않는다.
+현재 저장소의 Next.js 취약 버전과 관리자 페이지의 Proxy 단독 인증 의존은 해소했고, Production 환경변수·Supabase RLS·관리자/문의/기사 CRUD 회귀검증까지 완료했다. 남은 보안 후속은 서버리스 인스턴스별 rate limit을 공유 저장소 또는 Vercel 방어 계층으로 전환하는 작업과, 필요 시 stateless session의 서버 강제 폐기 기능을 도입하는 작업이다.
 
 ## 2026-08-12 적용 사항
 
@@ -149,7 +149,7 @@
 
 애플리케이션 수준 rate limit은 서버리스 인스턴스별 메모리를 사용하므로 Vercel WAF 또는 공유 저장소 기반 분산 rate limit을 추가해야 한다. 로그아웃은 브라우저 쿠키를 즉시 만료하지만 이미 탈취된 stateless 토큰의 서버 강제 폐기는 지원하지 않으므로, 필요하면 공유 세션 저장소 기반으로 전환한다.
 
-남은 순서는 Vercel 분산 rate limit → Production 환경변수 교체·검증 → Supabase RLS 증빙 → 전체 Production 회귀검증이다.
+Production 환경변수 교체·검증, Supabase RLS 증빙, 전체 Production 회귀검증은 완료됐다. 남은 순서는 Vercel/공유 저장소 기반 분산 rate limit → 필요 시 서버측 세션 강제 폐기다.
 
 ## Contact inquiry 운영 정상화
 

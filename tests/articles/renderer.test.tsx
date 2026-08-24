@@ -52,4 +52,50 @@ describe('MoneyPickArticle legacy compatibility', () => {
     expect(html).not.toContain('/calculators/acquisition-tax');
     expect(html).not.toContain('/calculators/not-real');
   });
+
+  it('renders a valid V2 schema instead of legacy body HTML', () => {
+    const html = renderToStaticMarkup(
+      <MoneyPickArticle
+        {...baseProps}
+        articleSchema={{
+          version: 2,
+          contentType: 'GUIDE',
+          pattern: 'GUIDE_01',
+          variant: 'A',
+          blocks: [
+            { type: 'summary', variant: 'S2', items: ['V2 요약 1', 'V2 요약 2'] },
+            { type: 'heading', text: 'V2 제목' },
+            { type: 'paragraph', text: 'V2 본문' },
+            { type: 'table', variant: 'T1', caption: '비교표', headers: ['항목', '값'], rows: [['금리', '3%']] },
+            { type: 'calculator', items: [{ label: 'DSR 계산기', href: '/calculators/dsr' }] },
+            { type: 'officialSources', variant: 'O1', agencyIds: ['fsc'] },
+            { type: 'faq', items: [{ q: 'V2 질문', a: 'V2 답변' }] },
+          ],
+        }}
+      />,
+    );
+
+    expect(html).toContain('V2 본문');
+    expect(html).toContain('비교표');
+    expect(html).toContain('/calculators/dsr');
+    expect(html).toContain('금융위원회');
+    expect(html).toContain('V2 질문');
+    expect(html).not.toContain('기존 HTML 본문');
+  });
+
+  it('falls back to legacy HTML when the V2 schema is invalid', () => {
+    const html = renderToStaticMarkup(
+      <MoneyPickArticle
+        {...baseProps}
+        articleSchema={{
+          version: 2,
+          contentType: 'GUIDE',
+          pattern: 'GUIDE_01',
+          variant: 'A',
+          blocks: [],
+        }}
+      />,
+    );
+    expect(html).toContain('기존 HTML 본문');
+  });
 });

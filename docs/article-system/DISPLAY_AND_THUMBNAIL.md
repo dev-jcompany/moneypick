@@ -4,6 +4,11 @@
 
 원 작업지시서 §18~20에 대한 설계.
 
+> 구현 상태 (2026-08-24): Phase 6의 DB 기반 홈 추천과 `featured`/`standard`/`compact`/
+> `numbered` 카드 변형이 구현됐다. Phase 7에서 카드 클릭과 기사 조회에 Content Type, Pattern,
+> Schema Variant, Card Variant, placement 차원을 전달하고 관리자 내부 조회수 기준선을 추가했다.
+> 외부 GA/Search Console 계정에서의 실제 수집 확인은 배포 후 운영 검증으로 남는다.
+
 ## 1. 현재 상태 (근거: ARTICLE_SYSTEM_V2.md §1.9, §1.10)
 
 - 홈 섹션 구성: `Hero → CategoryCards → PostsSection → CalculatorCards → RecommendedPosts →

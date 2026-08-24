@@ -35,6 +35,10 @@ import {
   buildRecommendedBlock,
   toArticleUrl,
 } from './link-cache.mjs';
+import {
+  articleSchemaToLegacyHtml,
+  validateArticleSchemaV2,
+} from '../lib/article-system/article-schema.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -242,25 +246,6 @@ function buildSourcesPromptBlock(matched) {
   ].join('\n');
 }
 
-function buildSourcesHtml(matched, dateStr) {
-  if (!matched.length) return '';
-  const items = matched
-    .map(a =>
-      `<li><a href="${a.url}" target="_blank" rel="noopener noreferrer"><strong>${a.name}</strong></a><br>${a.description}</li>`,
-    )
-    .join('\n');
-  return [
-    `<div class="mp-official-sources">`,
-    `<h2>공식 확인처</h2>`,
-    `<ul>`,
-    items,
-    `</ul>`,
-    `<p class="mp-official-sources-date">기준일: ${dateStr}</p>`,
-    `<p class="mp-official-sources-note">정책과 세부 조건은 변경될 수 있으므로 신청 또는 의사결정 전에 공식 기관의 최신 내용을 확인하세요.</p>`,
-    `</div>`,
-  ].join('\n');
-}
-
 function buildUserPrompt(topic, siblings) {
   return [
     `다음 한 개 주제로 머니픽 아티클 초안 JSON을 작성하세요.`,
@@ -272,6 +257,9 @@ function buildUserPrompt(topic, siblings) {
     `- metaDescription: Korean SEO summary, 120-150 characters, minimum 120 and maximum 180. Do not copy the body opening.`,
     `- 글유형 스켈레톤: ${SKELETON[topic.archetype] ?? '시스템 규칙 참고'}`,
     `- 참고 태그: ${(topic.planTags || []).join(', ') || '(없음)'}`,
+    `- articleSchemaBlocks: Article Schema V2 블록 배열. 첫 블록은 {"type":"summary","variant":"S1" 또는 "S2","items":[...]}이고, 마지막 부분에 {"type":"faq","items":[{"q":"...","a":"..."}]}를 반드시 포함하세요.`,
+    `- 허용 블록: heading{text}, paragraph{text}, checklist{title,items}, point{text}, warning{title?,text}, example{text}, calculator{items:[{label,href,caption?}]}, faq{items}, summary{variant,items}, table{variant:"T1",caption?,headers,rows}.`,
+    `- calculator href는 제공된 /calculators/... 내부 경로만 사용하세요. HTML 대신 articleSchemaBlocks에 전체 본문 의미를 담으세요.`,
     ``,
     `recommended 후보(같은 카테고리 내 다른 글 — 관련된 3~4개 골라 slug 합리적으로 생성):`,
     siblings.map(s => `  · ${s}`).join('\n'),
@@ -289,7 +277,7 @@ function extractJson(text) {
 
 // ── 검증 ──
 const REQUIRED = ['title', 'slug', 'category', 'archetype', 'heroStat', 'metaDescription', 'readingTime',
-                  'relatedCalculators', 'tags', 'recommended', 'bodyHtml'];
+                  'relatedCalculators', 'tags', 'recommended', 'articleSchemaBlocks'];
 function validate(obj) {
   const missing = REQUIRED.filter(k => !obj[k]);
   if (missing.length) throw new Error('필드 누락: ' + missing.join(', '));
@@ -298,9 +286,21 @@ function validate(obj) {
   if (metaLength > 180) throw new Error(`metaDescription 180자 초과: ${metaLength}자`);
   if (!Array.isArray(obj.relatedCalculators) || obj.relatedCalculators.length < 3)
     throw new Error('relatedCalculators 3개 이상 필요');
-  if (!/<ul class="mp-summary">/.test(obj.bodyHtml)) throw new Error('mp-summary 누락');
-  if (!/<div class="mp-faq">/.test(obj.bodyHtml))    throw new Error('mp-faq 누락');
-  if (/style=/.test(obj.bodyHtml)) throw new Error('인라인 style 발견');
+  const schemaResult = validateArticleSchemaV2(obj.articleSchema);
+  if (!schemaResult.valid) throw new Error(`Article Schema V2 검증 실패: ${schemaResult.errors.join(', ')}`);
+}
+
+function schemaVariantFor(history, patternId) {
+  const last = [...history].reverse().find(item => item.patternId === patternId);
+  return last?.schemaVariant === 'A' ? 'B' : 'A';
+}
+
+function buildArticleSchema(obj, contentType, patternId, variant, matchedSources) {
+  const blocks = Array.isArray(obj.articleSchemaBlocks) ? obj.articleSchemaBlocks.slice() : [];
+  if (matchedSources.length) {
+    blocks.push({ type: 'officialSources', variant: 'O1', agencyIds: matchedSources.map(source => source.id) });
+  }
+  return { version: 2, contentType, pattern: patternId, variant, blocks };
 }
 
 // ── Claude API 호출 ──
@@ -311,7 +311,14 @@ async function generateDraft(client, systemPrompt, topic, topics, samples, extra
     const fakeTopic = { id: s.id, category: s.category, archetype: s.archetype,
                         title: s.title, planTags: s.tags || [] };
     messages.push({ role: 'user',      content: buildUserPrompt(fakeTopic, (s.recommended||[]).map(r=>r.title)) });
-    messages.push({ role: 'assistant', content: JSON.stringify(s) });
+    messages.push({ role: 'assistant', content: JSON.stringify({
+      ...s,
+      articleSchemaBlocks: [
+        { type: 'summary', variant: 'S1', items: Array.isArray(s.summaryItems) && s.summaryItems.length ? s.summaryItems : [s.metaDescription] },
+        { type: 'paragraph', text: plainText(s.bodyHtml).slice(0, 1200) || s.metaDescription },
+        { type: 'faq', items: Array.isArray(s.faq) && s.faq.length ? s.faq : [{ q: `${s.title}의 핵심은 무엇인가요?`, a: s.metaDescription }] },
+      ],
+    }) });
   }
   const targetPrompt = buildUserPrompt(topic, siblingTitles(topics, topic));
   const fullPrompt = [targetPrompt, ...extraBlocks.filter(Boolean)].join('\n\n');
@@ -328,7 +335,7 @@ async function generateDraft(client, systemPrompt, topic, topics, samples, extra
 }
 
 async function repairMetaDescription(client, obj) {
-  const sourceText = plainText(obj.bodyHtml).slice(0, 800);
+  const sourceText = plainText(obj.bodyHtml ?? articleSchemaToLegacyHtml(obj.articleSchema)).slice(0, 800);
   const resp = await client.messages.create({
     model: MODEL,
     max_tokens: 400,
@@ -384,6 +391,7 @@ async function postDraft(obj, thumbnailUrl) {
     related_calculators: obj.relatedCalculators ?? [],
     article_type: obj.articleType ?? null,
     pattern_id: obj.patternId ?? null,
+    article_schema: obj.articleSchema,
   });
 
   const resp = await fetch(endpoint, {
@@ -410,6 +418,7 @@ async function postDraft(obj, thumbnailUrl) {
       thumbnailUrl:    thumbnailUrl ?? null,
       articleType:     obj.articleType ?? null,
       patternId:       obj.patternId ?? null,
+      articleSchema:   obj.articleSchema,
       relatedSlugs:    Array.isArray(obj.recommended)
                          ? obj.recommended.map(r => r?.slug).filter(Boolean)
                          : [],
@@ -452,7 +461,7 @@ async function main() {
     const previewHistory = state.history.slice();
     targets.forEach(t => {
       const typeResult = selectArticleType(t);
-      const { patternId, pattern } = pickPattern(typeResult.articleType, previewHistory, patternsConfig);
+      const { patternId, pattern } = pickPattern(typeResult.contentType, previewHistory, patternsConfig);
       const titleStyle = pickTitleStyle(previewHistory);
       console.log(`\n· (dry) #${t.id} [${t.archetype}] ${t.title}`);
       logSelection({ topic: t, typeResult, patternId, pattern, titleStyle });
@@ -483,9 +492,10 @@ async function main() {
 
     // 기사 유형 / 패턴 / 제목 스타일 선택 (재시도해도 동일 선택 유지)
     const typeResult  = selectArticleType(topic);
-    const { patternId, pattern } = pickPattern(typeResult.articleType, state.history, patternsConfig);
+    const { patternId, pattern } = pickPattern(typeResult.contentType, state.history, patternsConfig);
     const titleStyle  = pickTitleStyle(state.history);
-    const patternBlock = buildPatternPromptBlock(typeResult.articleType, patternId, pattern, titleStyle);
+    const schemaVariant = schemaVariantFor(state.history, patternId);
+    const patternBlock = buildPatternPromptBlock(typeResult.contentType, patternId, pattern, titleStyle);
     logSelection({ topic, typeResult, patternId, pattern, titleStyle });
 
     // 사례 자동 생성: 실제 계산기 공식으로 미리 계산한 값을 프롬프트에 주입 (있는 경우만)
@@ -522,17 +532,13 @@ async function main() {
         obj.archetype = topic.archetype;
         obj.articleType = typeResult.articleType;
         obj.patternId   = patternId;
+        obj.articleSchema = buildArticleSchema(obj, typeResult.contentType, patternId, schemaVariant, matchedSources);
+        obj.bodyHtml = articleSchemaToLegacyHtml(obj.articleSchema);
         obj.status   = 'draft';
         if (metaCharCount(obj.metaDescription) < 120 || metaCharCount(obj.metaDescription) > 180) {
           obj.metaDescription = await repairMetaDescription(client, obj);
         }
         validate(obj);
-
-        // 공식 확인처 HTML을 bodyHtml 끝에 append (validate 이후이므로 검증 영향 없음)
-        if (matchedSources.length) {
-          const dateStr = new Date().toISOString().slice(0, 10);
-          obj.bodyHtml += '\n' + buildSourcesHtml(matchedSources, dateStr);
-        }
 
         // 2) 썸네일 생성 (실패해도 글 등록은 계속)
         let thumbnailUrl = null;
@@ -561,6 +567,7 @@ async function main() {
           articleType: typeResult.articleType,
           patternId,
           titleStyle,
+          schemaVariant,
           generatedAt: new Date().toISOString(),
         });
         saveState(state);

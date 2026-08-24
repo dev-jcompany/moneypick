@@ -17,6 +17,10 @@ heading | paragraph | checklist | point | warning | example | calculator | faq
 `Block()` 함수에 구현돼 있다(스타일까지 완성). V2에서는 이 컴포넌트를 그대로 재사용하고
 Props 타입만 아래 확장 스키마로 넓힌다.
 
+> 구현 상태 (2026-08-24): 초기 Vertical Slice가 완료됐다. `summary`, `table`,
+> `officialSources`와 기존 핵심 Block을 `ArticleBlocksV2.tsx`에서 렌더하며, validator가 지원하지
+> 않는 구조는 V2로 렌더하지 않고 legacy HTML로 fallback한다.
+
 ## 2. 최종 Block 목록 (기존 8종 + 신규 12종 = 20종)
 
 | Block | 상태 | 용도 |

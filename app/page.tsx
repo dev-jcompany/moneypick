@@ -5,6 +5,8 @@ import CalculatorCards from '@/components/CalculatorCards';
 import RecommendedPosts from '@/components/RecommendedPosts';
 import BottomSection from '@/components/BottomSection';
 
+export const revalidate = 300;
+
 export default function HomePage() {
   return (
     <>

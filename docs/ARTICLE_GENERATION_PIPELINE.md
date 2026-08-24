@@ -1,6 +1,6 @@
 # MoneyPick Article Generation Pipeline
 
-Updated: 2026-08-18
+Updated: 2026-08-24
 
 ## Overview
 
@@ -102,12 +102,14 @@ Renderer-side `sanitizePostHtml` remains unchanged as a second safety boundary.
 
 ## Compatibility and operational limits
 
-- No DB migration or production backfill is performed.
+- This pipeline-integration sprint performed no content migration or production backfill. A later Article System V2 Phase 1 migration added only the nullable `article_schema` JSONB column; legacy rows remain `NULL` and were not backfilled.
 - Existing `body_html` remains the rendering source.
 - Existing empty `summary`/`faq` rows remain valid.
 - The admin UI is not redesigned; new drafts derive missing structures during save.
 - MCP and batch persistence must continue using the authenticated draft API.
 - Windows and Dev Container development servers must not run simultaneously against the same `.next` directory.
+- The scheduled generator requests `articleSchemaBlocks`, fixes Content Type/Pattern/Variant from the registry and rotation history, validates the V2 envelope, derives escaped compatibility HTML, and sends `articleSchema` to the authenticated draft API.
+- The draft API independently validates a supplied V2 schema. Legacy Claude Desktop callers may still omit it; the MCP tool now exposes the optional field.
 
 ## Verification
 

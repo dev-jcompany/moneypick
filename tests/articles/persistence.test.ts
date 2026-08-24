@@ -65,6 +65,22 @@ describe('article persistence pipeline', () => {
     }));
   });
 
+  it('preserves an explicit V2 article schema', async () => {
+    const articleSchema = {
+      version: 2 as const,
+      contentType: 'GUIDE' as const,
+      pattern: 'GUIDE_01',
+      variant: 'A',
+      blocks: [
+        { type: 'summary' as const, variant: 'S1' as const, items: ['핵심 요약'] },
+        { type: 'faq' as const, items: [{ q: '질문', a: '답변' }] },
+      ],
+    };
+
+    await createArticleThroughPipeline({ ...payload, article_schema: articleSchema });
+    expect(createMock).toHaveBeenCalledWith(expect.objectContaining({ article_schema: articleSchema }));
+  });
+
   it('passes a partial metadata update without inventing required fields', async () => {
     await updateArticleThroughPipeline('article-id', { thumbnail_url: 'https://example.com/image.png' });
     expect(updateMock).toHaveBeenCalledWith('article-id', { thumbnail_url: 'https://example.com/image.png' });

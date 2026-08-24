@@ -238,6 +238,7 @@ function rowToArticleProps(row: MoneypickArticleRow): MoneyPickArticleProps & { 
     metaDescription: row.meta_description ?? undefined,
     thumbnailUrl: row.thumbnail_url ?? undefined,
     bodyHtml: row.body_html,
+    articleSchema: row.article_schema ?? null,
     heroStat: row.hero_value ? { value: row.hero_value, label: row.hero_label ?? '' } : undefined,
     summary: row.summary ?? [],
     blocks: row.faq?.length
@@ -268,7 +269,29 @@ export type ArticleCard = {
   id: string; slug: string; title: string; lead: string;
   category_key: CategoryKey; category_label: string; reading_time: string | null;
   thumbnail_url: string | null; created_at: string;
+  views?: number; article_type?: string | null; pattern_id?: string | null;
+  article_schema?: import('@/lib/article-system/article-schema.mjs').ArticleSchemaV2 | null;
 };
+
+export async function getHomepageMoneypickArticles(limit = 5): Promise<ArticleCard[]> {
+  try {
+    const { data, error } = await client()
+      .from('moneypick_articles')
+      .select('id, slug, title, lead, category_key, category_label, reading_time, thumbnail_url, created_at, views, article_type, pattern_id, article_schema')
+      .eq('status', 'published')
+      .order('views', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (error) {
+      console.error('[db] getHomepageMoneypickArticles:', error.message);
+      return [];
+    }
+    return (data ?? []) as ArticleCard[];
+  } catch (e) {
+    console.error('[db] getHomepageMoneypickArticles exception:', e);
+    return [];
+  }
+}
 
 export async function getMoneypickArticlesByCategory(
   categoryKey: string,
@@ -279,7 +302,7 @@ export async function getMoneypickArticlesByCategory(
     const supabase = client();
     const { data, error } = await supabase
       .from('moneypick_articles')
-      .select('id, slug, title, lead, category_key, category_label, reading_time, thumbnail_url, created_at')
+      .select('id, slug, title, lead, category_key, category_label, reading_time, thumbnail_url, created_at, views, article_type, pattern_id, article_schema')
       .eq('category_key', categoryKey)
       .eq('status', 'published')
       .neq('slug', excludeSlug)
@@ -321,6 +344,21 @@ export async function getAllMoneypickArticles(): Promise<MoneypickArticleRow[]> 
   } catch (e) {
     console.error('[db] getAllMoneypickArticles exception:', e);
     return [];
+  }
+}
+
+export async function getMoneypickArticleByIdForAdmin(id: string): Promise<MoneypickArticleRow | null> {
+  try {
+    const { data, error } = await serverClient()
+      .from('moneypick_articles')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    if (error) console.error('[db] getMoneypickArticleByIdForAdmin:', error.message);
+    return (data as MoneypickArticleRow | null) ?? null;
+  } catch (e) {
+    console.error('[db] getMoneypickArticleByIdForAdmin exception:', e);
+    return null;
   }
 }
 
