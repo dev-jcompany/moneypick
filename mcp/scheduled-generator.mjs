@@ -80,6 +80,8 @@ const MODEL = (() => {
   const i = args.indexOf('--model');
   return i !== -1 ? args[i + 1] : 'claude-sonnet-4-6';
 })();
+const VISUALS_ENABLED = process.env.IMAGE_GENERATION_ENABLED !== 'false';
+const visualRun = { planned: 0, generated: 0, failures: 0, fatalCodes: new Set() };
 
 // ── 상수 ──
 const TOPICS_PATH = path.join(__dirname, 'topics.json');
@@ -314,9 +316,11 @@ function buildArticleSchema(obj, contentType, patternId, variant, matchedSources
 }
 
 async function addGeneratedVisuals(articleSchema, obj) {
-  if (process.env.IMAGE_GENERATION_ENABLED !== 'true') return articleSchema;
+  if (!VISUALS_ENABLED) return articleSchema;
+  if (visualRun.fatalCodes.size > 0) return articleSchema;
   const requested = visualCountForArticle({ contentType: articleSchema.contentType, blockCount: articleSchema.blocks.length });
   const plan = planArticleVisuals({ contentType: articleSchema.contentType, topic: obj.title, count: requested });
+  visualRun.planned += plan.length;
   if (!plan.length) return articleSchema;
   try {
     const result = await generateArticleVisualAssets({
@@ -326,6 +330,11 @@ async function addGeneratedVisuals(articleSchema, obj) {
       provider: createOpenAIImageProvider(),
       storage: createSupabaseVisualStorage(),
     });
+    visualRun.generated += result.visuals.length;
+    visualRun.failures += result.failures.length;
+    for (const failure of result.failures) {
+      if (['authentication', 'credit_exhausted', 'provider_stopped'].includes(failure.code)) visualRun.fatalCodes.add(failure.code);
+    }
     if (!result.visuals.length) return articleSchema;
     return {
       ...articleSchema,
@@ -333,6 +342,8 @@ async function addGeneratedVisuals(articleSchema, obj) {
       blocks: insertVisualBlocks(articleSchema.blocks, result.visuals),
     };
   } catch (error) {
+    visualRun.failures += plan.length;
+    if (['authentication', 'credit_exhausted', 'storage_authentication'].includes(error?.code)) visualRun.fatalCodes.add(error.code);
     console.warn(`  Visual pipeline 실패 (본문 Draft 계속): ${error?.code ?? 'unknown'}`);
     return articleSchema;
   }
@@ -508,8 +519,12 @@ async function main() {
       const dryCalcSlugs = dryScenario?.slug ? [dryScenario.slug] : [];
       const dryCandidates = matchRecommended(t, linkCache, 5, null, dryCalcSlugs, DEBUG);
       console.log(`recommended 후보(${dryCandidates.length}개): ${dryCandidates.length ? dryCandidates.map(c => c.slug).join(', ') : '(캐시 없음 — 기존 방식)'}`);
+      const dryVisualCount = visualCountForArticle({ contentType: typeResult.contentType, blockCount: 10 });
+      const dryVisuals = planArticleVisuals({ contentType: typeResult.contentType, topic: t.title, count: dryVisualCount });
+      console.log(`visuals: ${VISUALS_ENABLED ? `${dryVisuals.length}개 계획 (${dryVisuals.map(v => `${v.purpose}/${v.composition}`).join(', ')})` : '비활성화'}`);
       previewHistory.push({ topicKey: topicKey(t), articleType: typeResult.articleType, patternId, titleStyle });
     });
+    console.log(`\nVisual readiness: enabled=${VISUALS_ENABLED} / providerKey=${process.env.OPENAI_API_KEY ? 'present' : 'missing'} / storage=${process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY ? 'present' : 'missing'}`);
     return;
   }
 
@@ -646,8 +661,10 @@ async function main() {
   }
 
   console.log(`\n완료: 성공 ${results.success.length}개 / 실패 ${results.failed.length}개`);
+  console.log(`Visual: 계획 ${visualRun.planned}개 / 생성 ${visualRun.generated}개 / 제외 ${visualRun.failures}개`);
   console.log(`관리자에서 검수 후 발행하세요: ${process.env.ADMIN_API_URL}/mp-hub-8r6q2/articles`);
-  if (results.failed.length > 0) {
+  if (results.failed.length > 0 || visualRun.fatalCodes.size > 0) {
+    if (visualRun.fatalCodes.size > 0) console.error(`Visual provider fatal: ${[...visualRun.fatalCodes].join(', ')}`);
     process.exitCode = 1;
   }
 }

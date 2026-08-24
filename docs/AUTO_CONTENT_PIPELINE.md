@@ -33,6 +33,32 @@ schedule-state.json 업데이트
 관리자 검수 후 수동 발행
 ```
 
+## 오전 9시 예약 실행과 Article V2 Visual
+
+운영 Windows 예약 작업 `MoneypickGenerator`는 매일 09:00 KST에 기존 Entry Point를 실행한다.
+
+```text
+09:00 Scheduler
+→ node scheduled-generator.mjs --model claude-sonnet-4-6
+→ Article Planning / Block Planning
+→ ArticleSchemaV2
+→ Visual Planning
+→ OpenAI Image Provider (1~3장)
+→ Sharp WebP 최적화
+→ Supabase article-images Storage
+→ visualId Asset 연결
+→ POST /api/admin/articles/draft
+```
+
+별도 Visual scheduler는 없으며 수동 실행과 예약 실행이 같은 Generation Core를 사용한다.
+Visual은 기본 활성화이고 `IMAGE_GENERATION_ENABLED=false`일 때만 명시적으로 비활성화된다.
+개별 이미지 실패는 해당 이미지만 제외하고 Draft 저장을 계속하지만, Provider 인증·Credit 오류는
+실행 마지막에 exit code 1로 전달한다. Unit/dry 검증은 실제 Provider 호출이나 Draft 저장을 하지 않는다.
+
+기본 6개 기사와 기사당 최대 3장을 기준으로 하루 최대 18회다. 일반 2장 정책이면 약 12회다.
+Medium landscape를 약 USD 0.05/장으로 예산화하면 하루 약 USD 0.60~0.90, 30일 약
+USD 18~27이며 text input 및 Storage 비용은 별도다. 실제 비용은 활성화 전 공식 가격 계산기로 재확인한다.
+
 ---
 
 ## 파일 구조

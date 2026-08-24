@@ -13,6 +13,8 @@ Git baseline: `c749645` (`master`, synchronized with `origin/master` at Sprint s
 - Local Schema/Renderer E2E and responsive browser checks passed at 360px, 390px, and desktop. Production Storage upload and Draft creation were not executed because the standing security rule prohibits Production data-changing tests without separate operational approval.
 - Runtime configuration (not committed to `.env`): `OPENAI_API_KEY`, optional `IMAGE_GENERATION_MODEL` (default `gpt-image-2`), `IMAGE_GENERATION_ENABLED=true`, `IMAGE_GENERATION_RETRY=1`, optional `ARTICLE_IMAGE_BUCKET` (default `article-images`). Keys are server-only.
 - Cost guardrail: medium 1536×1024 is budgeted at approximately USD 0.05/image and USD 0.15 for a normal three-image article, plus small text-input and Storage costs. Reconfirm against the official OpenAI pricing calculator before enabling Production.
+- 09:00 scheduler audit: existing `MoneypickGenerator` remains daily at 09:00 KST with six-article default and calls the same `mcp/scheduled-generator.mjs`. Visual planning is now part of that Entry Point; no second scheduler exists. Daily budget is 12–18 images, about USD 0.60–0.90/day or USD 18–27/30 days at the current planning estimate.
+- Operational blocker: the 2026-08-24 09:00 task returned exit code 1, and `OPENAI_API_KEY` is currently missing. Dry mode can validate the complete call path without writes, but the next live Visual generation is not ready until the server-only key is configured.
 
 ## Executive status
 
