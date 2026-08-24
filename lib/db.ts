@@ -275,7 +275,8 @@ export type ArticleCard = {
 
 export async function getHomepageMoneypickArticles(limit = 5): Promise<ArticleCard[]> {
   try {
-    const { data, error } = await client()
+    const supabase = client();
+    const { data, error } = await supabase
       .from('moneypick_articles')
       .select('id, slug, title, lead, category_key, category_label, reading_time, thumbnail_url, created_at, views, article_type, pattern_id, article_schema')
       .eq('status', 'published')
@@ -283,6 +284,31 @@ export async function getHomepageMoneypickArticles(limit = 5): Promise<ArticleCa
       .order('created_at', { ascending: false })
       .limit(limit);
     if (error) {
+      if (isMissingOptionalArticleColumn(error)) {
+        const { data: compatibleData, error: compatibleError } = await supabase
+          .from('moneypick_articles')
+          .select('id, slug, title, lead, category_key, category_label, reading_time, thumbnail_url, created_at, views, article_schema')
+          .eq('status', 'published')
+          .order('views', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(limit);
+        if (!compatibleError) return (compatibleData ?? []) as ArticleCard[];
+
+        if (isMissingOptionalArticleColumn(compatibleError)) {
+          const { data: legacyData, error: legacyError } = await supabase
+            .from('moneypick_articles')
+            .select('id, slug, title, lead, category_key, category_label, reading_time, created_at, views')
+            .eq('status', 'published')
+            .order('views', { ascending: false })
+            .order('created_at', { ascending: false })
+            .limit(limit);
+          if (!legacyError) return (legacyData ?? []).map((row) => ({ ...row, thumbnail_url: null })) as ArticleCard[];
+          console.error('[db] getHomepageMoneypickArticles:', legacyError.message);
+          return [];
+        }
+        console.error('[db] getHomepageMoneypickArticles:', compatibleError.message);
+        return [];
+      }
       console.error('[db] getHomepageMoneypickArticles:', error.message);
       return [];
     }
