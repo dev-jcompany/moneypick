@@ -413,6 +413,7 @@ export type ArticleSavePayload = {
   pattern_id?: string | null;
   recommended_slugs?: string[] | null;
   article_schema?: import('@/lib/article-system/article-schema.mjs').ArticleSchemaV2 | null;
+  created_at?: string;
 };
 
 export type ArticleSaveResult = {

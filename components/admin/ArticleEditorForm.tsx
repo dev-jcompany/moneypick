@@ -76,6 +76,13 @@ function splitHeroStat(value: string) {
   };
 }
 
+function toDateTimeLocal(value?: string) {
+  const date = value ? new Date(value) : new Date();
+  const validDate = Number.isNaN(date.getTime()) ? new Date() : date;
+  const pad = (number: number) => String(number).padStart(2, '0');
+  return `${validDate.getFullYear()}-${pad(validDate.getMonth() + 1)}-${pad(validDate.getDate())}T${pad(validDate.getHours())}:${pad(validDate.getMinutes())}`;
+}
+
 async function imageFileToDataUrl(file: File): Promise<string> {
   const objectUrl = URL.createObjectURL(file);
 
@@ -136,6 +143,7 @@ export default function ArticleEditorForm({ existing }: Props) {
   const [heroLabel, setHeroLabel] = useState(existing?.hero_label ?? fallbackHeroStat.label);
   const [readingTime, setReadingTime] = useState(existing?.reading_time ?? '');
   const [editor, setEditor] = useState(existing?.editor ?? '머니픽 에디터');
+  const [createdAt, setCreatedAt] = useState(toDateTimeLocal(existing?.created_at));
   const [relatedCalculatorHrefs, setRelatedCalculatorHrefs] = useState<string[]>(
     existing?.related_calculators?.length
       ? existing.related_calculators.map((calculator) => calculator.href)
@@ -212,6 +220,11 @@ export default function ArticleEditorForm({ existing }: Props) {
       setError('대표 이미지 URL은 https://로 시작하는 실제 이미지 주소여야 합니다.');
       return;
     }
+    const createdAtDate = new Date(createdAt);
+    if (!createdAt || Number.isNaN(createdAtDate.getTime())) {
+      setError('등록일을 확인해주세요.');
+      return;
+    }
 
     let resolvedBodyHtml = bodyHtml.trim();
     let articleSchema: ArticleSavePayload['article_schema'] = null;
@@ -283,6 +296,7 @@ export default function ArticleEditorForm({ existing }: Props) {
       pattern_id: editorMode === 'v2' ? pattern : existing?.pattern_id ?? null,
       recommended_slugs: existing?.recommended_slugs ?? null,
       article_schema: articleSchema,
+      created_at: createdAtDate.toISOString(),
     };
 
     const url = isEdit ? `/api/articles/${existing.id}` : '/api/articles';
@@ -447,6 +461,18 @@ export default function ArticleEditorForm({ existing }: Props) {
             />
           </Row>
         </div>
+
+        <Row label="등록일">
+          <input
+            type="datetime-local"
+            value={createdAt}
+            onChange={(event) => setCreatedAt(event.target.value)}
+            required
+            step={60}
+            className="w-full rounded-lg border border-[#d7dbd8] px-3 py-2 text-[14px]"
+          />
+          <p className="mt-1 text-[12px] text-[#9aa39c]">목록 정렬과 글에 표시되는 등록일에 반영됩니다.</p>
+        </Row>
       </Card>
 
       <Card title="대표 이미지 (목록 전용)">

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { deleteMoneypickArticle } from '@/lib/db';
 import { updateArticleThroughPipeline } from '@/lib/articles/persistence';
 import { isAdminRequest, unauthorized } from '@/lib/admin-auth';
+import { normalizeEditableCreatedAt } from '@/lib/articles/created-at';
 
 interface Context { params: Promise<{ id: string }> }
 
@@ -11,6 +12,13 @@ export async function PATCH(req: NextRequest, { params }: Context) {
   try {
     const { id } = await params;
     const payload = await req.json();
+    if (Object.prototype.hasOwnProperty.call(payload, 'created_at')) {
+      try {
+        payload.created_at = normalizeEditableCreatedAt(payload.created_at);
+      } catch (error) {
+        return NextResponse.json({ error: error instanceof Error ? error.message : '등록일 형식이 올바르지 않습니다.' }, { status: 400 });
+      }
+    }
     const result = await updateArticleThroughPipeline(id, payload);
 
     if (!result.ok) {

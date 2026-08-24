@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createArticleThroughPipeline } from '@/lib/articles/persistence';
 import { isAdminRequest, unauthorized } from '@/lib/admin-auth';
 import type { ArticleSavePayload } from '@/lib/db';
+import { normalizeEditableCreatedAt } from '@/lib/articles/created-at';
 
 export async function POST(req: NextRequest) {
   if (!isAdminRequest(req)) return unauthorized();
@@ -10,6 +11,11 @@ export async function POST(req: NextRequest) {
     const payload: ArticleSavePayload = await req.json();
     if (!payload.title || !payload.slug || !payload.body_html) {
       return NextResponse.json({ error: '필수 항목이 누락되었습니다.' }, { status: 400 });
+    }
+    try {
+      payload.created_at = normalizeEditableCreatedAt(payload.created_at);
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : '등록일 형식이 올바르지 않습니다.' }, { status: 400 });
     }
 
     const result = await createArticleThroughPipeline(payload);
