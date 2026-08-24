@@ -17,7 +17,7 @@ export default async function PostsSection() {
 
   return (
     <section className="py-10 bg-[#F6F8FA] dark:bg-navy-900">
-      <div className="max-w-[1200px] mx-auto px-4">
+      <div className="max-w-[1500px] mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
           <div className="md:col-span-3 bg-white dark:bg-navy-800 rounded-2xl border border-[#E8ECEF] dark:border-navy-700 p-6">
             <h2 className="text-[17px] font-bold text-[#1A1D1F] dark:text-white mb-5">인기 콘텐츠 TOP 5</h2>

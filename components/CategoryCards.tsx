@@ -14,7 +14,7 @@ export default async function CategoryCards() {
 
   return (
     <section className="py-10 bg-[#F6F8FA] dark:bg-navy-900 border-b border-[#E8ECEF] dark:border-navy-700">
-      <div className="max-w-[1200px] mx-auto px-4">
+      <div className="max-w-[1500px] mx-auto px-4">
         <h2 className="text-lg font-bold text-[#1A1D1F] dark:text-white mb-5">카테고리 바로가기</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
           {categories.map((cat) => {

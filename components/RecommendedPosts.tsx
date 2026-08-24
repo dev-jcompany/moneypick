@@ -8,7 +8,7 @@ export default async function RecommendedPosts() {
 
   return (
     <section className="bg-[#F6F8FA] py-10 dark:bg-navy-900">
-      <div className="mx-auto max-w-[1200px] px-4">
+      <div className="mx-auto max-w-[1500px] px-4">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-[17px] font-bold text-[#1A1D1F] dark:text-white">추천 콘텐츠</h2>
           <Link href="/posts" className="text-[12px] font-medium text-[#8A949E] transition-colors hover:text-[#21A05A] dark:text-slate-500">

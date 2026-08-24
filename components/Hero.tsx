@@ -16,7 +16,7 @@ export default function Hero() {
 
   return (
     <section className="bg-white dark:bg-navy-850 py-14 md:py-20 border-b border-[#E8ECEF] dark:border-navy-700">
-      <div className="max-w-[1200px] mx-auto px-4">
+      <div className="max-w-[1500px] mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
           {/* Left */}
           <div className="flex-1 min-w-0">

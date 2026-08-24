@@ -69,7 +69,7 @@ export default async function CategoryPage({ params }: Props) {
   const totalCount = posts.length + articles.length;
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 pb-10 pt-5 md:pb-14 md:pt-6">
+    <div className="mx-auto max-w-[1500px] px-4 pb-10 pt-5 md:pb-14 md:pt-6">
       <header className="mb-9 rounded-3xl border border-[#E8ECEF] bg-white p-7 dark:border-navy-700 dark:bg-navy-800 md:p-9">
         <div className="mb-3 text-4xl" aria-hidden="true">{cat.icon}</div>
         <h1 className="mb-3 text-3xl font-extrabold text-[#1A1D1F] dark:text-white">{cat.name}</h1>

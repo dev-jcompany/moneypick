@@ -18,7 +18,7 @@ export default function BottomSection() {
 
   return (
     <section className="py-10 bg-white dark:bg-navy-850 border-t border-[#E8ECEF] dark:border-navy-700">
-      <div className="max-w-[1200px] mx-auto px-4">
+      <div className="max-w-[1500px] mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Newsletter */}
           <div className="bg-[#F6F8FA] dark:bg-navy-800 rounded-xl border border-[#E8ECEF] dark:border-navy-700 p-5">

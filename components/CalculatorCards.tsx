@@ -16,7 +16,7 @@ export default function CalculatorCards() {
 
   return (
     <section className="py-10 bg-white dark:bg-navy-850">
-      <div className="max-w-[1200px] mx-auto px-4">
+      <div className="max-w-[1500px] mx-auto px-4">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-[17px] font-bold text-[#1A1D1F] dark:text-white">인기 계산기</h2>
           <Link
