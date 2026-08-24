@@ -1,7 +1,19 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
 import { calculators } from '@/src/data/calculators';
 
 export default function CalculatorCards() {
+  const [expanded, setExpanded] = useState(false);
+
+  function collapsedVisibility(index: number) {
+    if (index < 2) return 'flex';
+    if (index < 4) return 'hidden sm:flex';
+    if (index < 6) return 'hidden md:flex';
+    return 'hidden';
+  }
+
   return (
     <section className="py-10 bg-white dark:bg-navy-850">
       <div className="max-w-[1200px] mx-auto px-4">
@@ -15,11 +27,11 @@ export default function CalculatorCards() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {calculators.map((calc) => (
+          {calculators.map((calc, index) => (
             <Link
               key={calc.id}
               href={`/calculators/${calc.slug}`}
-              className="bg-[#F6F8FA] dark:bg-navy-800 rounded-xl border border-[#E8ECEF] dark:border-navy-700 p-5 hover:shadow-md hover:-translate-y-0.5 hover:border-[#21A05A] dark:hover:border-[#21A05A] transition-all group flex flex-col"
+              className={`bg-[#F6F8FA] dark:bg-navy-800 rounded-xl border border-[#E8ECEF] dark:border-navy-700 p-5 hover:shadow-md hover:-translate-y-0.5 hover:border-[#21A05A] dark:hover:border-[#21A05A] transition-all group flex-col ${expanded ? 'flex' : collapsedVisibility(index)}`}
             >
               <span className="text-2xl mb-3" aria-hidden="true">{calc.icon}</span>
               <h3 className="font-bold text-[#1A1D1F] dark:text-white text-[14px] mb-1.5">
@@ -34,6 +46,18 @@ export default function CalculatorCards() {
             </Link>
           ))}
         </div>
+        {calculators.length > 6 && (
+          <div className="mt-6 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setExpanded((current) => !current)}
+              aria-expanded={expanded}
+              className="rounded-full border border-[#D8E0DC] bg-white px-6 py-2.5 text-[13px] font-bold text-[#4D5852] transition hover:border-[#21A05A] hover:text-[#17794A] dark:border-navy-700 dark:bg-navy-800 dark:text-slate-300"
+            >
+              {expanded ? '접기 ↑' : '더보기 ↓'}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
