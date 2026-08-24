@@ -55,6 +55,11 @@ Visual은 기본 활성화이고 `IMAGE_GENERATION_ENABLED=false`일 때만 명�
 개별 이미지 실패는 해당 이미지만 제외하고 Draft 저장을 계속하지만, Provider 인증·Credit 오류는
 실행 마지막에 exit code 1로 전달한다. Unit/dry 검증은 실제 Provider 호출이나 Draft 저장을 하지 않는다.
 
+예약 작업 Action은 `mcp/run-scheduled-generator.ps1`을 호출한다. 이 래퍼는 stdout/stderr를
+`mcp/logs/scheduled-generator/scheduled-generator_yyyy-MM-dd_HHmmss.log`에 함께 저장하고
+Secret 패턴을 마스킹하며 30일이 지난 로그를 삭제한다. Generator의 원래 exit code를 그대로
+작업 스케줄러에 반환한다. 로그 디렉터리는 Git에서 제외된다.
+
 기본 6개 기사와 기사당 최대 3장을 기준으로 하루 최대 18회다. 일반 2장 정책이면 약 12회다.
 Medium landscape를 약 USD 0.05/장으로 예산화하면 하루 약 USD 0.60~0.90, 30일 약
 USD 18~27이며 text input 및 Storage 비용은 별도다. 실제 비용은 활성화 전 공식 가격 계산기로 재확인한다.

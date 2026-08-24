@@ -46,6 +46,7 @@ yarn-error.log*
 # generated content previews and runtime caches
 /콘텐츠/
 /mcp/link-cache.json
+/mcp/logs/
 
 # temporary and backup files
 *.tmp

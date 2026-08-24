@@ -15,6 +15,7 @@ Git baseline: `c749645` (`master`, synchronized with `origin/master` at Sprint s
 - Cost guardrail: medium 1536×1024 is budgeted at approximately USD 0.05/image and USD 0.15 for a normal three-image article, plus small text-input and Storage costs. Reconfirm against the official OpenAI pricing calculator before enabling Production.
 - 09:00 scheduler audit: existing `MoneypickGenerator` remains daily at 09:00 KST with six-article default and calls the same `mcp/scheduled-generator.mjs`. Visual planning is now part of that Entry Point; no second scheduler exists. Daily budget is 12–18 images, about USD 0.60–0.90/day or USD 18–27/30 days at the current planning estimate.
 - Operational blocker: the 2026-08-24 09:00 task returned exit code 1, and `OPENAI_API_KEY` is currently missing. Dry mode can validate the complete call path without writes, but the next live Visual generation is not ready until the server-only key is configured.
+- Scheduler logging: the existing task Action now calls `mcp/run-scheduled-generator.ps1`; timestamped stdout/stderr logs are Secret-masked, retained for 30 days, ignored by Git, and preserve the generator exit code. The 09:00 KST trigger and six-article default remain unchanged.
 
 ## Executive status
 
