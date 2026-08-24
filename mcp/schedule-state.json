@@ -144,6 +144,17 @@
     "세금연구소:46",
     "세금연구소:48",
     "세금연구소:49",
-    "세금연구소:50"
+    "세금연구소:50",
+    "세금연구소:47"
+  ],
+  "history": [
+    {
+      "topicKey": "세금연구소:47",
+      "articleType": "POLICY_CHANGE",
+      "patternId": "POLICY_01",
+      "titleStyle": "비교형",
+      "schemaVariant": "A",
+      "generatedAt": "2026-08-24T16:32:09.153Z"
+    }
   ]
 }

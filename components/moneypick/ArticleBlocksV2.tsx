@@ -53,14 +53,14 @@ export default function ArticleBlocksV2({ schema, accent, accentDark }: Props) {
             return <section key={index} className="my-8 rounded-2xl border border-slate-200 p-6 dark:border-navy-700"><h2 className="mb-4 text-xl font-extrabold">공식 확인처</h2><ul className="space-y-3">{agencies.map((agency) => <li key={agency.id}><a href={agency.url} target="_blank" rel="noopener noreferrer" className="font-bold underline">{agency.name}</a><p className="text-sm text-slate-600 dark:text-slate-400">{agency.description}</p></li>)}</ul></section>;
           }
           case 'image': {
-            const widthClass = block.variant === 'split' ? 'mx-auto max-w-2xl' : 'w-full';
+            const widthClass = 'mx-auto w-full md:w-[70%]';
             const frameClass = block.variant === 'diagram' ? 'border border-slate-200 bg-white p-3 dark:border-navy-700 dark:bg-navy-900' : 'overflow-hidden';
-            return <figure key={index} className={`my-8 ${widthClass}`}><div className={`rounded-2xl ${frameClass}`}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={block.src} alt={block.alt} loading="lazy" className="aspect-[16/9] w-full object-cover" /></div>{block.caption ? <figcaption className="mt-2 text-center text-sm leading-relaxed text-slate-500 dark:text-slate-400">{block.caption}</figcaption> : null}</figure>;
+            return <figure key={index} className={`my-8 ${widthClass}`}><div className={`rounded-2xl ${frameClass}`}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={block.src} alt={block.alt} loading="lazy" className="aspect-[16/9] w-full object-contain" /></div>{block.caption ? <figcaption className="mt-2 text-center text-sm leading-relaxed text-slate-500 dark:text-slate-400">{block.caption}</figcaption> : null}</figure>;
           }
           case 'visual': {
             const visual = schema.visuals?.find((item) => item.id === block.visualId);
             if (!visual?.asset) return null;
-            return <figure key={index} className="my-8 w-full"><div className="overflow-hidden rounded-2xl bg-slate-50 dark:bg-navy-900">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={visual.asset.url} alt={visual.alt} width={visual.asset.width} height={visual.asset.height} loading="lazy" decoding="async" className="aspect-[16/9] h-auto w-full object-cover" /></div></figure>;
+            return <figure key={index} className="mx-auto my-8 w-full md:w-[70%]"><div className="overflow-hidden rounded-2xl">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={visual.asset.url} alt={visual.alt} width={visual.asset.width} height={visual.asset.height} loading="lazy" decoding="async" className="aspect-[16/9] h-auto w-full object-contain" /></div></figure>;
           }
           case 'numberResult':
             return <section key={index} className={`my-8 rounded-2xl p-6 ${block.variant === 'HIGHLIGHT' ? 'bg-green-50 dark:bg-green-900/20' : 'border border-slate-200 dark:border-navy-700'}`}><p className="text-sm font-semibold text-slate-500 dark:text-slate-400">{block.label}</p><p className="mt-2 break-words text-3xl font-black tracking-tight" style={{ color: accentDark }}>{block.value}</p>{block.caption ? <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{block.caption}</p> : null}</section>;

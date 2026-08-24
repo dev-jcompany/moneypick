@@ -1,0 +1,93 @@
+[
+  {
+    "type": "summary",
+    "variant": "S1",
+    "items": [
+      "DSR은 연소득에서 모든 대출의 연간 원리금 상환액이 차지하는 비율이에요.",
+      "주택담보대출뿐 아니라 신용대출과 자동차 할부 등도 함께 반영될 수 있어요.",
+      "대출 신청 전 소득과 기존 부채를 기준으로 예상 DSR을 먼저 확인하는 것이 좋아요."
+    ]
+  },
+  {
+    "type": "heading",
+    "text": "DSR은 무엇을 의미하나요?"
+  },
+  {
+    "type": "paragraph",
+    "text": "DSR은 총부채원리금상환비율을 뜻해요. 한 해 동안 갚아야 하는 모든 대출의 원금과 이자를 연소득으로 나눈 비율이에요."
+  },
+  {
+    "type": "image",
+    "variant": "wide",
+    "src": "https://cpwjpoozevvfgxwjqgdd.supabase.co/storage/v1/object/public/article-images/articles/dsr-visual-e2e-20260824/visual-01-4ff53ae42827.webp",
+    "alt": "연소득과 연간 원리금 상환액으로 DSR을 계산하는 구조",
+    "caption": "DSR은 연간 원리금 상환액을 연소득으로 나누어 계산해요."
+  },
+  {
+    "type": "heading",
+    "text": "DSR 계산 구조를 확인해 보세요"
+  },
+  {
+    "type": "paragraph",
+    "text": "연소득이 5,000만원이고 모든 대출의 연간 원리금 상환액이 2,000만원이라면 예상 DSR은 40%예요."
+  },
+  {
+    "type": "numberResult",
+    "variant": "HIGHLIGHT",
+    "label": "예상 DSR",
+    "value": "40%",
+    "caption": "연간 원리금 2,000만원을 연소득 5,000만원으로 나눈 예시예요."
+  },
+  {
+    "type": "image",
+    "variant": "wide",
+    "src": "https://cpwjpoozevvfgxwjqgdd.supabase.co/storage/v1/object/public/article-images/articles/dsr-visual-e2e-20260824/visual-02-0f3bfcc1a6ee.webp",
+    "alt": "여러 대출의 원리금이 DSR에 합산되는 과정",
+    "caption": "주택담보대출 외의 기존 부채도 함께 점검해야 해요."
+  },
+  {
+    "type": "checklist",
+    "title": "대출 신청 전에 확인할 내용",
+    "items": [
+      "금융회사가 인정하는 연소득",
+      "주택담보대출의 연간 원리금",
+      "신용대출과 자동차 할부 등 기존 금융부채",
+      "대출 금리와 상환 기간"
+    ]
+  },
+  {
+    "type": "warning",
+    "title": "주의",
+    "text": "같은 소득과 대출금액이라도 적용 금리와 만기, 상환 방식에 따라 실제 DSR과 대출 한도가 달라질 수 있어요."
+  },
+  {
+    "type": "image",
+    "variant": "wide",
+    "src": "https://cpwjpoozevvfgxwjqgdd.supabase.co/storage/v1/object/public/article-images/articles/dsr-visual-e2e-20260824/visual-03-5cf320a0e6a3.webp",
+    "alt": "대출 신청 전 DSR을 확인하는 단계별 절차",
+    "caption": "소득과 기존 부채를 정리한 다음 예상 DSR을 확인해 보세요."
+  },
+  {
+    "type": "calculator",
+    "items": [
+      {
+        "label": "DSR 계산기",
+        "href": "/calculators/dsr",
+        "caption": "소득과 대출 정보를 입력해 예상 비율을 확인해 보세요."
+      }
+    ]
+  },
+  {
+    "type": "faq",
+    "items": [
+      {
+        "q": "DSR에는 주택담보대출만 포함되나요?",
+        "a": "아니에요. 신용대출과 자동차 할부 등 다른 금융부채의 원리금도 포함될 수 있어요."
+      },
+      {
+        "q": "DSR이 같으면 대출 한도도 항상 같은가요?",
+        "a": "금융회사와 상품별 심사 기준, 인정소득, 금리와 만기가 다르기 때문에 실제 한도는 달라질 수 있어요."
+      }
+    ]
+  }
+]

@@ -221,7 +221,7 @@ export async function getPostByNumberSlug(postNumber: number, englishSlug: strin
 
 // ── moneypick_articles ──────────────────────────────
 
-function rowToArticleProps(row: MoneypickArticleRow): MoneyPickArticleProps & { _id: string; _slug: string; _status: string } {
+export function rowToArticleProps(row: MoneypickArticleRow): MoneyPickArticleProps & { _id: string; _slug: string; _status: string } {
   return {
     _id: row.id,
     _slug: row.slug,

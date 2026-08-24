@@ -183,7 +183,7 @@ function sampleMetaDescription(sample) {
 }
 
 function withMetaDescription(sample) {
-  if (metaCharCount(sample.metaDescription) >= 120) return sample;
+  if (metaCharCount(sample.metaDescription) >= 90) return sample;
   return { ...sample, metaDescription: sampleMetaDescription(sample) };
 }
 
@@ -266,7 +266,7 @@ function buildUserPrompt(topic, siblings) {
     `- category: ${topic.category}`,
     `- archetype: ${topic.archetype}`,
     `- title: ${topic.title}`,
-    `- metaDescription: Korean SEO summary, 120-150 characters, minimum 120 and maximum 180. Do not copy the body opening.`,
+    `- metaDescription: Korean SEO summary, preferably 90-120 characters. Minimum 80 characters. Do not copy the body opening.`,
     `- 글유형 스켈레톤: ${SKELETON[topic.archetype] ?? '시스템 규칙 참고'}`,
     `- 참고 태그: ${(topic.planTags || []).join(', ') || '(없음)'}`,
     `- articleSchemaBlocks: Article Schema V2 블록 배열. 첫 블록은 {"type":"summary","variant":"S1" 또는 "S2","items":[...]}이고, 마지막 부분에 {"type":"faq","items":[{"q":"...","a":"..."}]}를 반드시 포함하세요.`,
@@ -294,8 +294,9 @@ function validate(obj) {
   const missing = REQUIRED.filter(k => !obj[k]);
   if (missing.length) throw new Error('필드 누락: ' + missing.join(', '));
   const metaLength = metaCharCount(obj.metaDescription);
-  if (metaLength < 120) throw new Error(`metaDescription 120자 미만: ${metaLength}자`);
-  if (metaLength > 180) throw new Error(`metaDescription 180자 초과: ${metaLength}자`);
+  if (metaLength < 80) throw new Error(`metaDescription 80자 미만: ${metaLength}자`);
+  if (metaLength < 90) console.warn(`  metaDescription 경고: ${metaLength}자 (권장 90~120자)`);
+  if (metaLength > 160) console.warn(`  metaDescription 경고: ${metaLength}자 (권장 최대 160자)`);
   if (!Array.isArray(obj.relatedCalculators) || obj.relatedCalculators.length < 3)
     throw new Error('relatedCalculators 3개 이상 필요');
   const schemaResult = validateArticleSchemaV2(obj.articleSchema);
@@ -390,7 +391,7 @@ async function repairMetaDescription(client, obj) {
       role: 'user',
       content: [
         'Rewrite metaDescription in Korean.',
-        'Length: 130-150 Korean characters, never under 120 and never over 180.',
+        'Length: preferably 90-120 Korean characters, never under 80.',
         'Structure: what this article is about + who should read it + core value.',
         'Tone: friendly hae-yo style. Do not copy the body opening.',
         `Title: ${obj.title}`,
@@ -583,13 +584,14 @@ async function main() {
         obj.articleType = typeResult.articleType;
         obj.patternId   = patternId;
         obj.articleSchema = buildArticleSchema(obj, typeResult.contentType, patternId, schemaVariant, matchedSources);
-        obj.articleSchema = await addGeneratedVisuals(obj.articleSchema, obj);
         obj.bodyHtml = articleSchemaToLegacyHtml(obj.articleSchema);
         obj.status   = 'draft';
-        if (metaCharCount(obj.metaDescription) < 120 || metaCharCount(obj.metaDescription) > 180) {
+        if (metaCharCount(obj.metaDescription) < 80) {
           obj.metaDescription = await repairMetaDescription(client, obj);
         }
         validate(obj);
+        obj.articleSchema = await addGeneratedVisuals(obj.articleSchema, obj);
+        obj.bodyHtml = articleSchemaToLegacyHtml(obj.articleSchema);
 
         // 2) 썸네일 생성 (실패해도 글 등록은 계속)
         let thumbnailUrl = null;

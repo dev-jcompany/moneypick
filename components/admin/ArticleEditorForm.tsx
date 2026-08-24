@@ -219,9 +219,15 @@ export default function ArticleEditorForm({ existing }: Props) {
     if (editorMode === 'v2') {
       let parsedBlocks: unknown;
       try {
-        parsedBlocks = JSON.parse(blocksJson);
-      } catch {
-        setError('V2 블록 JSON 문법을 확인해주세요.');
+        const normalizedBlocksJson = blocksJson
+          .trim()
+          .replace(/^```(?:json)?\s*/i, '')
+          .replace(/\s*```$/i, '')
+          .trim();
+        parsedBlocks = JSON.parse(normalizedBlocksJson);
+      } catch (parseError) {
+        const detail = parseError instanceof Error ? parseError.message : '';
+        setError(`V2 블록 JSON 문법을 확인해주세요.${detail ? ` (${detail})` : ''}`);
         return;
       }
 
@@ -231,6 +237,7 @@ export default function ArticleEditorForm({ existing }: Props) {
         pattern,
         variant: schemaVariant.trim(),
         blocks: parsedBlocks,
+        ...(existingSchema?.visuals ? { visuals: existingSchema.visuals } : {}),
       };
       const validation = validateArticleSchemaV2(candidate);
       if (!validation.valid || !isArticleSchemaV2(candidate)) {
@@ -302,6 +309,16 @@ export default function ArticleEditorForm({ existing }: Props) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-extrabold text-[#1a1d1f]">{isEdit ? '아티클 수정' : '새 아티클'}</h1>
         <div className="flex gap-2">
+          {existing && (
+            <a
+              href={adminPath(`/articles/${existing.id}/preview`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-[#21A05A] bg-white px-4 py-2 text-[14px] font-semibold text-[#17794A] hover:bg-[#EFF7F2]"
+            >
+              저장본 미리보기
+            </a>
+          )}
           <button
             type="button"
             onClick={() => handleSave('draft')}

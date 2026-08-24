@@ -5,6 +5,7 @@ import {
   planArticleVisuals,
 } from '../../lib/article-system/visual-system.mjs';
 import {
+  createOpenAIImageProvider,
   ImageGenerationError,
   generateArticleVisualAssets,
   safeArticleAssetPath,
@@ -17,6 +18,7 @@ describe('MoneyPick visual planning', () => {
     expect(new Set(visuals.map((visual) => visual.composition)).size).toBe(3);
     expect(visuals.every((visual) => visual.style === 'MONEYPICK_MINIMAL_FLAT')).toBe(true);
     expect(buildMoneyPickImagePrompt(visuals[0], 'DSR 계산 가이드')).toContain('No text, letters, numbers');
+    expect(buildMoneyPickImagePrompt(visuals[0], 'DSR 계산 가이드')).toContain('fully transparent background');
   });
 
   it('places visual blocks among content and keeps FAQ', () => {
@@ -30,6 +32,17 @@ describe('MoneyPick visual planning', () => {
 
 describe('Visual image pipeline', () => {
   const visual = planArticleVisuals({ contentType: 'GUIDE', topic: 'DSR', count: 1 })[0];
+
+  it('requests a transparent PNG from OpenAI', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ data: [{ b64_json: Buffer.from('png').toString('base64') }] }),
+    });
+    const provider = createOpenAIImageProvider({ apiKey: 'test-key', fetchImpl });
+    await provider.generate({ prompt: 'transparent finance illustration' });
+    const request = fetchImpl.mock.calls[0][1];
+    expect(JSON.parse(request.body)).toMatchObject({ output_format: 'png', background: 'transparent' });
+  });
 
   it('optimizes, uploads, and returns permanent asset metadata with mocks', async () => {
     const svg = Buffer.from('<svg width="32" height="18" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="18" fill="white"/></svg>');
